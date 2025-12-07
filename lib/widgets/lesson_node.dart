@@ -6,12 +6,14 @@ class LessonNode extends StatefulWidget {
   final LessonModel lesson;
   final VoidCallback? onTap;
   final bool showConnector;
+  final bool verticalLayout;
 
   const LessonNode({
     super.key,
     required this.lesson,
     this.onTap,
     this.showConnector = true,
+    this.verticalLayout = false,
   });
 
   @override
@@ -61,23 +63,40 @@ class _LessonNodeState extends State<LessonNode>
   }
 
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    if (widget.verticalLayout) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           GestureDetector(
             onTap: widget.lesson.isAccessible ? widget.onTap : null,
-            child: Row(
-              children: [
-                _buildNodeCircle(),
-                AppSpacing.horizontalGapLG,
-                Expanded(child: _buildLessonInfo()),
-              ],
-            ),
+            child: _buildNodeCircle(vertical: true),
           ),
+          const SizedBox(height: 12),
+          _buildLessonInfo(vertical: true),
           if (widget.showConnector) _buildConnector(),
         ],
       );
+    }
 
-  Widget _buildNodeCircle() => AnimatedBuilder(
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: widget.lesson.isAccessible ? widget.onTap : null,
+          child: Row(
+            children: [
+              _buildNodeCircle(vertical: false),
+              AppSpacing.horizontalGapLG,
+              Expanded(child: _buildLessonInfo(vertical: false)),
+            ],
+          ),
+        ),
+        if (widget.showConnector) _buildConnector(),
+      ],
+    );
+  }
+
+  Widget _buildNodeCircle({required bool vertical}) => AnimatedBuilder(
         animation: _pulseAnimation,
         builder: (context, child) {
           final scale = widget.lesson.status == LessonStatus.current
@@ -90,8 +109,8 @@ class _LessonNodeState extends State<LessonNode>
           );
         },
         child: Container(
-          width: 64,
-          height: 64,
+          width: vertical ? 80 : 64,
+          height: vertical ? 80 : 64,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: _getGradient(),
@@ -110,7 +129,7 @@ class _LessonNodeState extends State<LessonNode>
             ),
           ),
           child: Center(
-            child: _getNodeContent(),
+            child: _getNodeContent(vertical: vertical),
           ),
         ),
       );
@@ -152,53 +171,58 @@ class _LessonNodeState extends State<LessonNode>
     }
   }
 
-  Widget _getNodeContent() {
+  Widget _getNodeContent({required bool vertical}) {
     switch (widget.lesson.status) {
       case LessonStatus.completed:
-        return const Icon(
+        return Icon(
           Icons.check_rounded,
-          color: AppColors.textPrimary,
-          size: 28,
+          color: vertical ? Colors.white : AppColors.textPrimary,
+          size: vertical ? 36 : 28,
         );
       case LessonStatus.current:
         return Text(
           '${widget.lesson.position}',
           style: AppTypography.headlineMedium.copyWith(
-            color: AppColors.textPrimary,
+            color: vertical ? Colors.white : AppColors.textPrimary,
+            fontWeight: vertical ? FontWeight.bold : FontWeight.normal,
           ),
         );
       case LessonStatus.locked:
-        return const Icon(
+        return Icon(
           Icons.lock_rounded,
-          color: AppColors.lockedLight,
-          size: 24,
+          color: vertical ? Colors.grey.shade500 : AppColors.lockedLight,
+          size: vertical ? 36 : 24,
         );
     }
   }
 
-  Widget _buildLessonInfo() {
+  Widget _buildLessonInfo({required bool vertical}) {
     final isLocked = widget.lesson.status == LessonStatus.locked;
 
     return Opacity(
       opacity: isLocked ? 0.5 : 1.0,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            vertical ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             widget.lesson.title,
-            style: AppTypography.titleLarge.copyWith(
+            style: AppTypography.titleMedium.copyWith(
               color: isLocked ? AppColors.textMuted : AppColors.textPrimary,
             ),
+            textAlign: vertical ? TextAlign.center : null,
           ),
-          AppSpacing.verticalGapXS,
+          const SizedBox(height: 8),
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               _buildInfoChip(
                 icon: Icons.bolt_rounded,
                 label: '${widget.lesson.xp} XP',
                 color: AppColors.warning,
               ),
-              AppSpacing.horizontalGapSM,
+              const SizedBox(width: 8),
               _buildInfoChip(
                 icon: Icons.schedule_rounded,
                 label: '${widget.lesson.estimatedMinutes} min',
