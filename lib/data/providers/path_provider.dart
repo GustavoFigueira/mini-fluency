@@ -64,11 +64,14 @@ class PathProvider extends ChangeNotifier {
         continue;
       }
 
+      if (lesson.status == LessonStatus.completed) {
+        updatedLessons.add(updatedLesson);
+        continue;
+      }
+
       if (i == 0 ||
           (i > 0 && updatedLessons[i - 1].status == LessonStatus.completed)) {
         if (lesson.status == LessonStatus.locked) {
-          updatedLesson = lesson.copyWith(status: LessonStatus.current);
-        } else if (lesson.status == LessonStatus.completed) {
           updatedLesson = lesson.copyWith(status: LessonStatus.current);
         }
       }

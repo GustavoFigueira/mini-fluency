@@ -69,10 +69,6 @@ class _TaskCardState extends State<TaskCard>
     }
   }
 
-  void _handleTap() {
-    widget.onToggle();
-  }
-
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
         animation: _scaleAnimation,
@@ -81,7 +77,7 @@ class _TaskCardState extends State<TaskCard>
           child: child,
         ),
         child: GestureDetector(
-          onTap: _handleTap,
+          onTap: () => ButtonTapHandler.handleTap(widget.onToggle),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             padding: AppSpacing.paddingLG,

@@ -154,15 +154,10 @@ class _TasksScreenState extends State<TasksScreen>
                         task: task,
                         isCompleted: isCurrentlyCompleted,
                         onToggle: () {
-                          final wasCompleted = provider.isTaskCompleted(task.id);
                           provider.toggleTaskCompletion(
                             widget.lessonId,
                             task.id,
                           );
-                          final isNowCompleted = provider.isTaskCompleted(task.id);
-                          if (!wasCompleted && isNowCompleted) {
-                            _audioService.playTaskCompleted();
-                          }
                         },
                       ),
                     ),
@@ -214,7 +209,9 @@ class _TasksScreenState extends State<TasksScreen>
       );
 
   Widget _buildBackButton() => GestureDetector(
-        onTap: () => Navigator.of(context).pop(),
+        onTap: () => ButtonTapHandler.handleTap(
+          () => Navigator.of(context).pop(),
+        ),
         child: Container(
           width: 44,
           height: 44,

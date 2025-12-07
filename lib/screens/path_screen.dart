@@ -73,19 +73,23 @@ class _PathScreenState extends State<PathScreen>
   }
 
   void _showSoundPreferences() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const SoundPreferencesSheet(),
-    );
+    ButtonTapHandler.handleTap(() {
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) => const SoundPreferencesSheet(),
+      );
+    });
   }
 
   void _navigateToSettings() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const SettingsScreen(),
-      ),
-    );
+    ButtonTapHandler.handleTap(() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const SettingsScreen(),
+        ),
+      );
+    });
   }
 
   void _navigateToTasks(LessonModel lesson) {
@@ -269,7 +273,7 @@ class _PathScreenState extends State<PathScreen>
 
   Widget _buildHeaderAction(IconData icon, VoidCallback onTap) =>
       GestureDetector(
-        onTap: onTap,
+        onTap: () => ButtonTapHandler.handleTap(onTap),
         child: Container(
           width: 44,
           height: 44,
@@ -354,7 +358,9 @@ class _PathScreenState extends State<PathScreen>
             alignment: alignment,
             child: LessonNode(
               lesson: lesson,
-              onTap: () => _showLessonDetails(lesson),
+              onTap: () => ButtonTapHandler.handleTap(
+                () => _showLessonDetails(lesson),
+              ),
               showConnector: false,
               verticalLayout: true,
             ),

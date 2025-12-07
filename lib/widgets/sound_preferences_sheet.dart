@@ -106,7 +106,7 @@ class _SoundPreferencesSheetState extends State<SoundPreferencesSheet> {
           ),
           Switch(
             value: value,
-            onChanged: onChanged,
+            onChanged: (newValue) => ButtonTapHandler.handleToggle(onChanged, newValue: newValue),
             activeThumbColor: AppColors.primary,
           ),
         ],

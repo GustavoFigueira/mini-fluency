@@ -56,7 +56,7 @@ class ErrorScreen extends StatelessWidget {
                   width: double.infinity,
                   height: 52,
                   child: ElevatedButton(
-                    onPressed: onRetry,
+                    onPressed: () => ButtonTapHandler.handleTap(onRetry),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: AppColors.textPrimary,

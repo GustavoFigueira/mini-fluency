@@ -42,7 +42,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded, color: Colors.black),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => ButtonTapHandler.handleTap(
+              () => Navigator.of(context).pop(),
+            ),
           ),
           title: Text(
             'CONFIGURAÇÕES',
@@ -199,7 +201,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Color? iconColor,
   }) =>
       InkWell(
-        onTap: onTap,
+        onTap: () => ButtonTapHandler.handleTap(onTap),
         borderRadius: BorderRadius.circular(8),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -261,7 +263,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           Switch(
             value: value,
-            onChanged: onChanged,
+            onChanged: (newValue) => ButtonTapHandler.handleToggle(onChanged, newValue: newValue),
             activeThumbColor: AppColors.primary,
           ),
         ],
@@ -272,19 +274,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _handleSfxToggle(bool value) async {
-    HapticFeedback.lightImpact();
     await AudioService().setSfxEnabled(enabled: value);
     setState(() {});
   }
 
   Future<void> _handleMusicToggle(bool value) async {
-    HapticFeedback.lightImpact();
     await AudioService().setMusicEnabled(enabled: value);
     setState(() {});
   }
 
   Future<void> _handleVibrationToggle(bool value) async {
-    HapticFeedback.lightImpact();
     await AudioService().setVibrationEnabled(enabled: value);
     setState(() {});
   }
