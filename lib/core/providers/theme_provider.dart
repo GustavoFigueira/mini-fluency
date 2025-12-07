@@ -18,11 +18,17 @@ class ThemeProvider extends ChangeNotifier {
   Future<void> _loadTheme() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final themeIndex = prefs.getInt(_themeKey) ?? AppThemeMode.dark.index;
-      _themeMode = AppThemeMode.values[themeIndex];
+      if (prefs.containsKey(_themeKey)) {
+        final themeIndex = prefs.getInt(_themeKey)!;
+        _themeMode = AppThemeMode.values[themeIndex];
+      } else {
+        _themeMode = AppThemeMode.dark;
+      }
       notifyListeners();
     } catch (e) {
       debugPrint('Error loading theme: $e');
+      _themeMode = AppThemeMode.dark;
+      notifyListeners();
     }
   }
 
@@ -47,4 +53,3 @@ class ThemeProvider extends ChangeNotifier {
     await setThemeMode(newMode);
   }
 }
-

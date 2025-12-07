@@ -75,6 +75,7 @@ class AudioService {
 
     try {
       await _backgroundPlayer.setReleaseMode(ReleaseMode.loop);
+      await _backgroundPlayer.setVolume(0.35);
       await _backgroundPlayer.play(
         AssetSource('audio/background_music.mp3'),
       );
@@ -99,6 +100,7 @@ class AudioService {
     if (!_isSfxEnabled) return;
 
     try {
+      await _sfxPlayer.setVolume(0.5);
       await _sfxPlayer.play(AssetSource('audio/intro.mp3'));
     } catch (e) {
       debugPrint('Error playing intro: $e');
@@ -110,6 +112,7 @@ class AudioService {
 
     try {
       await _sfxPlayer.stop();
+      await _sfxPlayer.setVolume(0.5);
       await _sfxPlayer.play(AssetSource('audio/button-tap-pop.mp3'));
     } catch (e) {
       debugPrint('Error playing button tap: $e');
@@ -120,6 +123,7 @@ class AudioService {
     if (!_isSfxEnabled) return;
 
     try {
+      await _sfxPlayer.setVolume(0.5);
       await _sfxPlayer.play(AssetSource('audio/completed.mp3'));
     } catch (e) {
       debugPrint('Error playing lesson completed: $e');

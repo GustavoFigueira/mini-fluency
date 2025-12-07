@@ -12,9 +12,12 @@ class ErrorScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: AppColors.backgroundGradient,
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
+    return DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: colors.backgroundGradient,
         ),
         child: Center(
           child: Padding(
@@ -27,28 +30,32 @@ class ErrorScreen extends StatelessWidget {
                   height: 80,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.error.withValues(alpha: 0.15),
+                    color: colors.error.withValues(alpha: 0.15),
                     border: Border.all(
-                      color: AppColors.error.withValues(alpha: 0.3),
+                      color: colors.error.withValues(alpha: 0.3),
                       width: 2,
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.error_outline_rounded,
-                    color: AppColors.error,
+                    color: colors.error,
                     size: 40,
                   ),
                 ),
                 AppSpacing.verticalGapXXL,
                 Text(
                   'Ops! Algo deu errado',
-                  style: AppTypography.headlineMedium,
+                  style: AppTypography.headlineMedium.copyWith(
+                    color: colors.textPrimary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 AppSpacing.verticalGapMD,
                 Text(
                   message,
-                  style: AppTypography.bodyMedium,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: colors.textSecondary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 AppSpacing.verticalGapXXL,
@@ -58,8 +65,8 @@ class ErrorScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () => ButtonTapHandler.handleTap(onRetry),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.textPrimary,
+                      backgroundColor: colors.primary,
+                      foregroundColor: colors.textPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.circular(AppSpacing.borderRadiusMD),
@@ -76,4 +83,5 @@ class ErrorScreen extends StatelessWidget {
           ),
         ),
       );
+  }
 }

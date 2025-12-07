@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:mini_fluency/core/core.dart';
 import 'package:mini_fluency/core/services/audio_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -58,6 +59,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         body: SingleChildScrollView(
           child: Column(
             children: [
+              _buildThemeSection(),
               _buildAccountSection(),
               _buildSoundPreferencesSection(),
               _buildInformationSection(),
@@ -73,6 +75,74 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ),
+      );
+
+  Widget _buildThemeSection() => Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) => _buildSectionCard(
+          children: [
+            Text(
+              'APARÊNCIA',
+              style: AppTypography.titleLarge.copyWith(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildThemeOption(
+              icon: themeProvider.isDarkMode
+                  ? Icons.dark_mode_rounded
+                  : Icons.light_mode_rounded,
+              label: 'Tema escuro',
+              value: themeProvider.isDarkMode,
+              onChanged: (value) {
+                ButtonTapHandler.handleToggle(
+                  (newValue) => themeProvider.setThemeMode(
+                    newValue ? AppThemeMode.dark : AppThemeMode.light,
+                  ),
+                  newValue: value,
+                );
+              },
+            ),
+          ],
+        ),
+    );
+
+  Widget _buildThemeOption({
+    required IconData icon,
+    required String label,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) =>
+      Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: AppColors.primary,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              label,
+              style: AppTypography.titleMedium.copyWith(
+                color: Colors.black,
+              ),
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeThumbColor: AppColors.primary,
+          ),
+        ],
       );
 
   Widget _buildAccountSection() => _buildSectionCard(
