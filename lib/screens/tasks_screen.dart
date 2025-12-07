@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mini_fluency/core/core.dart';
 import 'package:mini_fluency/data/data.dart';
 import 'package:mini_fluency/models/models.dart';
+import 'package:mini_fluency/widgets/completion_celebration.dart';
 import 'package:mini_fluency/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -21,6 +22,8 @@ class _TasksScreenState extends State<TasksScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+  bool _showCelebration = false;
+  LessonModel? _previousLessonState;
 
   @override
   void initState() {
@@ -42,6 +45,24 @@ class _TasksScreenState extends State<TasksScreen>
     super.dispose();
   }
 
+  void _checkCompletion(PathProvider provider, LessonModel lesson) {
+    final completedCount = provider.getCompletedTasksCount(widget.lessonId);
+    final totalCount = provider.getTotalTasksCount(widget.lessonId);
+    final isCompleted = completedCount == totalCount && totalCount > 0;
+
+    if (!isCompleted) {
+      _showCelebration = false;
+      return;
+    }
+
+    if (_showCelebration) return;
+
+    final wasCompleted = _previousLessonState?.status == LessonStatus.completed;
+    if (wasCompleted) return;
+
+    setState(() => _showCelebration = true);
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         body: DecoratedBox(
@@ -55,7 +76,23 @@ class _TasksScreenState extends State<TasksScreen>
                 if (lesson == null) {
                   return _buildNotFound();
                 }
-                return _buildContent(provider, lesson);
+
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _checkCompletion(provider, lesson);
+                  _previousLessonState = lesson;
+                });
+
+                return Stack(
+                  children: [
+                    _buildContent(provider, lesson),
+                    if (_showCelebration)
+                      CompletionCelebration(
+                        onComplete: () {
+                          setState(() => _showCelebration = false);
+                        },
+                      ),
+                  ],
+                );
               },
             ),
           ),

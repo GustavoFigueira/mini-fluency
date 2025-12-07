@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mini_fluency/core/core.dart';
+import 'package:mini_fluency/core/services/audio_service.dart';
 import 'package:mini_fluency/data/data.dart';
 import 'package:mini_fluency/screens/screens.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +30,7 @@ class MiniFluencyApp extends StatelessWidget {
           title: 'Mini Fluency',
           debugShowCheckedModeBanner: false,
           theme: _buildTheme(),
-          home: const PathScreen(),
+          home: const PathScreenWithAudio(),
         ),
       );
 
@@ -70,4 +71,30 @@ class MiniFluencyApp extends StatelessWidget {
           ThemeData.dark().textTheme,
         ),
       );
+}
+
+class PathScreenWithAudio extends StatefulWidget {
+  const PathScreenWithAudio({super.key});
+
+  @override
+  State<PathScreenWithAudio> createState() => _PathScreenWithAudioState();
+}
+
+class _PathScreenWithAudioState extends State<PathScreenWithAudio> {
+  final _audioService = AudioService();
+
+  @override
+  void initState() {
+    super.initState();
+    _audioService.playBackgroundMusic();
+  }
+
+  @override
+  void dispose() {
+    _audioService.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => const PathScreen();
 }

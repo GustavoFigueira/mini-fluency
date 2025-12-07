@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mini_fluency/core/core.dart';
+import 'package:mini_fluency/core/services/audio_service.dart';
 import 'package:mini_fluency/data/data.dart';
 import 'package:mini_fluency/models/models.dart';
 import 'package:mini_fluency/screens/tasks_screen.dart';
+import 'package:mini_fluency/widgets/lesson_transition.dart';
 import 'package:mini_fluency/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -18,6 +20,8 @@ class _PathScreenState extends State<PathScreen>
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   late ScrollController _scrollController;
+  final _audioService = AudioService();
+  Map<String, LessonStatus> _previousLessonStatuses = {};
 
   @override
   void initState() {
@@ -31,6 +35,7 @@ class _PathScreenState extends State<PathScreen>
       curve: Curves.easeOut,
     );
     _scrollController = ScrollController();
+    _audioService.playBackgroundMusic();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PathProvider>().loadPath();
@@ -64,7 +69,25 @@ class _PathScreenState extends State<PathScreen>
         ),
         transitionDuration: const Duration(milliseconds: 350),
       ),
-    );
+    ).then((_) {
+      _updatePreviousStatuses();
+    });
+  }
+
+  void _updatePreviousStatuses() {
+    final provider = context.read<PathProvider>();
+    final path = provider.path;
+    if (path == null) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() {
+        _previousLessonStatuses = {
+          for (final lesson in path.lessons)
+            lesson.id: lesson.status,
+        };
+      });
+    });
   }
 
   @override
@@ -115,6 +138,20 @@ class _PathScreenState extends State<PathScreen>
     final lessons = path.lessons;
     final reversedLessons = lessons.reversed.toList();
 
+    if (_previousLessonStatuses.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final currentPath = context.read<PathProvider>().path;
+        if (currentPath == null) return;
+        setState(() {
+          _previousLessonStatuses = {
+            for (final lesson in currentPath.lessons)
+              lesson.id: lesson.status,
+          };
+        });
+      });
+    }
+
     return Stack(
       children: [
         _buildBackgroundDecorations(),
@@ -122,7 +159,7 @@ class _PathScreenState extends State<PathScreen>
           children: [
             _buildHeader(path.name, path.description),
             Expanded(
-              child: _buildLessonsPath(reversedLessons),
+              child: _buildLessonsPath(reversedLessons, provider),
             ),
             _buildBottomIcon(),
           ],
@@ -183,24 +220,34 @@ class _PathScreenState extends State<PathScreen>
         ),
       );
 
-  Widget _buildHeaderAction(IconData icon) => Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.2),
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.4),
+  Widget _buildHeaderAction(IconData icon) => GestureDetector(
+        onTap: () {
+          if (icon == Icons.volume_up_outlined) {
+            _audioService.toggleBackgroundMusic();
+          }
+        },
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.2),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.4),
+            ),
           ),
-        ),
-        child: Icon(
-          icon,
-          color: AppColors.primaryLight,
-          size: 22,
+          child: Icon(
+            icon,
+            color: AppColors.primaryLight,
+            size: 22,
+          ),
         ),
       );
 
-  Widget _buildLessonsPath(List<LessonModel> reversedLessons) =>
+  Widget _buildLessonsPath(
+    List<LessonModel> reversedLessons,
+    PathProvider provider,
+  ) =>
       ListView.builder(
         controller: _scrollController,
         padding: const EdgeInsets.symmetric(vertical: 20),
@@ -209,6 +256,7 @@ class _PathScreenState extends State<PathScreen>
         itemBuilder: (context, index) {
           final lesson = reversedLessons[index];
           final isEven = index.isEven;
+          final previousStatus = _previousLessonStatuses[lesson.id];
 
           return TweenAnimationBuilder<double>(
             tween: Tween(begin: 0.0, end: 1.0),
@@ -221,11 +269,23 @@ class _PathScreenState extends State<PathScreen>
                 child: child,
               ),
             ),
-            child: _buildLessonNode(
-              lesson: lesson,
-              isEven: isEven,
-              showConnector: index < reversedLessons.length - 1,
-              nextIsEven: (index + 1).isEven,
+            child: LessonTransition(
+              previousLesson: LessonModel(
+                id: lesson.id,
+                title: lesson.title,
+                position: lesson.position,
+                status: previousStatus ?? lesson.status,
+                xp: lesson.xp,
+                estimatedMinutes: lesson.estimatedMinutes,
+                tasks: lesson.tasks,
+              ),
+              currentLesson: lesson,
+              child: _buildLessonNode(
+                lesson: lesson,
+                isEven: isEven,
+                showConnector: index < reversedLessons.length - 1,
+                nextIsEven: (index + 1).isEven,
+              ),
             ),
           );
         },

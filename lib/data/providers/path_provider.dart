@@ -60,7 +60,11 @@ class PathProvider extends ChangeNotifier {
 
       if (allTasksCompleted) {
         updatedLesson = lesson.copyWith(status: LessonStatus.completed);
-      } else if (i == 0 ||
+        updatedLessons.add(updatedLesson);
+        continue;
+      }
+
+      if (i == 0 ||
           (i > 0 && updatedLessons[i - 1].status == LessonStatus.completed)) {
         if (lesson.status == LessonStatus.locked) {
           updatedLesson = lesson.copyWith(status: LessonStatus.current);
@@ -101,10 +105,12 @@ class PathProvider extends ChangeNotifier {
         if (lesson.status != LessonStatus.completed) {
           updatedLesson = lesson.copyWith(status: LessonStatus.completed);
         }
-      } else {
-        if (lesson.status == LessonStatus.completed) {
-          updatedLesson = lesson.copyWith(status: LessonStatus.current);
-        }
+        updatedLessons.add(updatedLesson);
+        continue;
+      }
+
+      if (lesson.status == LessonStatus.completed) {
+        updatedLesson = lesson.copyWith(status: LessonStatus.current);
       }
 
       if (i > 0) {

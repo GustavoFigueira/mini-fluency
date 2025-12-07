@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
 
   ## Community Packages
+  # Audio player for background music
+  audioplayers: ^6.1.0
   # Code generation annotations
   freezed_annotation: ^2.4.4
   # Themed fonts
@@ -50,5 +52,6 @@ flutter:
     - assets/data/
     - assets/images/
     - assets/images/logos/
+    - assets/audio/
 
 scripts: derry.yaml
