@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mini_fluency/core/core.dart';
+import 'package:mini_fluency/core/services/audio_service.dart';
 import 'package:mini_fluency/data/data.dart';
 import 'package:mini_fluency/models/models.dart';
-import 'package:mini_fluency/widgets/completion_celebration.dart';
 import 'package:mini_fluency/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +24,7 @@ class _TasksScreenState extends State<TasksScreen>
   late Animation<double> _fadeAnimation;
   bool _showCelebration = false;
   LessonModel? _previousLessonState;
+  final _audioService = AudioService();
 
   @override
   void initState() {
@@ -61,6 +62,7 @@ class _TasksScreenState extends State<TasksScreen>
     if (wasCompleted) return;
 
     setState(() => _showCelebration = true);
+    _audioService.playLessonCompleted();
   }
 
   @override
@@ -133,6 +135,8 @@ class _TasksScreenState extends State<TasksScreen>
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final task = lesson.tasks[index];
+                  final isCurrentlyCompleted = provider.isTaskCompleted(task.id);
+
                   return Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.md),
                     child: TweenAnimationBuilder<double>(
@@ -148,11 +152,18 @@ class _TasksScreenState extends State<TasksScreen>
                       ),
                       child: TaskCard(
                         task: task,
-                        isCompleted: provider.isTaskCompleted(task.id),
-                        onToggle: () => provider.toggleTaskCompletion(
-                          widget.lessonId,
-                          task.id,
-                        ),
+                        isCompleted: isCurrentlyCompleted,
+                        onToggle: () {
+                          final wasCompleted = provider.isTaskCompleted(task.id);
+                          provider.toggleTaskCompletion(
+                            widget.lessonId,
+                            task.id,
+                          );
+                          final isNowCompleted = provider.isTaskCompleted(task.id);
+                          if (!wasCompleted && isNowCompleted) {
+                            _audioService.playTaskCompleted();
+                          }
+                        },
                       ),
                     ),
                   );

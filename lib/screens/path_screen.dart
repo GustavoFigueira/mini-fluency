@@ -3,6 +3,7 @@ import 'package:mini_fluency/core/core.dart';
 import 'package:mini_fluency/core/services/audio_service.dart';
 import 'package:mini_fluency/data/data.dart';
 import 'package:mini_fluency/models/models.dart';
+import 'package:mini_fluency/screens/settings_screen.dart';
 import 'package:mini_fluency/screens/tasks_screen.dart';
 import 'package:mini_fluency/widgets/lesson_transition.dart';
 import 'package:mini_fluency/widgets/widgets.dart';
@@ -22,6 +23,7 @@ class _PathScreenState extends State<PathScreen>
   late ScrollController _scrollController;
   final _audioService = AudioService();
   Map<String, LessonStatus> _previousLessonStatuses = {};
+  bool _hasPlayedIntro = false;
 
   @override
   void initState() {
@@ -35,10 +37,14 @@ class _PathScreenState extends State<PathScreen>
       curve: Curves.easeOut,
     );
     _scrollController = ScrollController();
-    _audioService.playBackgroundMusic();
+    _audioService.initialize();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PathProvider>().loadPath();
+      if (!_hasPlayedIntro) {
+        _audioService.playIntro();
+        _hasPlayedIntro = true;
+      }
     });
   }
 
@@ -47,6 +53,39 @@ class _PathScreenState extends State<PathScreen>
     _fadeController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _showLessonDetails(LessonModel lesson) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => LessonDetailsSheet(
+        lesson: lesson,
+        onStart: lesson.isAccessible
+            ? () {
+                Navigator.of(context).pop();
+                _navigateToTasks(lesson);
+              }
+            : null,
+      ),
+    );
+  }
+
+  void _showSoundPreferences() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const SoundPreferencesSheet(),
+    );
+  }
+
+  void _navigateToSettings() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SettingsScreen(),
+      ),
+    );
   }
 
   void _navigateToTasks(LessonModel lesson) {
@@ -87,6 +126,13 @@ class _PathScreenState extends State<PathScreen>
             lesson.id: lesson.status,
         };
       });
+    });
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
   }
 
@@ -149,6 +195,7 @@ class _PathScreenState extends State<PathScreen>
               lesson.id: lesson.status,
           };
         });
+        _scrollToBottom();
       });
     }
 
@@ -213,19 +260,16 @@ class _PathScreenState extends State<PathScreen>
               ),
             ),
             const SizedBox(width: 12),
-            _buildHeaderAction(Icons.settings_outlined),
+            _buildHeaderAction(Icons.settings_outlined, _navigateToSettings),
             const SizedBox(width: 8),
-            _buildHeaderAction(Icons.volume_up_outlined),
+            _buildHeaderAction(Icons.volume_up_outlined, _showSoundPreferences),
           ],
         ),
       );
 
-  Widget _buildHeaderAction(IconData icon) => GestureDetector(
-        onTap: () {
-          if (icon == Icons.volume_up_outlined) {
-            _audioService.toggleBackgroundMusic();
-          }
-        },
+  Widget _buildHeaderAction(IconData icon, VoidCallback onTap) =>
+      GestureDetector(
+        onTap: onTap,
         child: Container(
           width: 44,
           height: 44,
@@ -310,7 +354,7 @@ class _PathScreenState extends State<PathScreen>
             alignment: alignment,
             child: LessonNode(
               lesson: lesson,
-              onTap: () => _navigateToTasks(lesson),
+              onTap: () => _showLessonDetails(lesson),
               showConnector: false,
               verticalLayout: true,
             ),

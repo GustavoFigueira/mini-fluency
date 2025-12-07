@@ -86,7 +86,7 @@ class _PathScreenWithAudioState extends State<PathScreenWithAudio> {
   @override
   void initState() {
     super.initState();
-    _audioService.playBackgroundMusic();
+    _audioService.initialize();
   }
 
   @override

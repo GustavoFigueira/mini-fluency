@@ -70,7 +70,7 @@ linter:
     prefer_spread_collections: true
     require_trailing_commas: true
     sized_box_for_whitespace: true
-    sort_pub_dependencies: true
+    sort_pub_dependencies: false
     unnecessary_await_in_return: true
     unnecessary_brace_in_string_interps: true
     unnecessary_const: true

@@ -172,6 +172,8 @@ class _LessonNodeState extends State<LessonNode>
   }
 
   Widget _getNodeContent({required bool vertical}) {
+    final isFirstLesson = widget.lesson.position == 1;
+
     switch (widget.lesson.status) {
       case LessonStatus.completed:
         return Icon(
@@ -180,6 +182,29 @@ class _LessonNodeState extends State<LessonNode>
           size: vertical ? 36 : 28,
         );
       case LessonStatus.current:
+        if (isFirstLesson && vertical) {
+          return Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              Text(
+                '${widget.lesson.position}',
+                style: AppTypography.headlineMedium.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Positioned(
+                top: -12,
+                child: Icon(
+                  Icons.school_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+            ],
+          );
+        }
         return Text(
           '${widget.lesson.position}',
           style: AppTypography.headlineMedium.copyWith(

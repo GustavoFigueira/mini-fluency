@@ -17,10 +17,8 @@ class CompletionCelebration extends StatefulWidget {
 class _CompletionCelebrationState extends State<CompletionCelebration>
     with TickerProviderStateMixin {
   late AnimationController _scaleController;
-  late AnimationController _rotationController;
   late AnimationController _particlesController;
   late Animation<double> _scaleAnimation;
-  late Animation<double> _rotationAnimation;
   late Animation<double> _particlesAnimation;
 
   @override
@@ -32,11 +30,6 @@ class _CompletionCelebrationState extends State<CompletionCelebration>
       duration: const Duration(milliseconds: 600),
     );
 
-    _rotationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    );
-
     _particlesController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
@@ -46,13 +39,6 @@ class _CompletionCelebrationState extends State<CompletionCelebration>
       CurvedAnimation(
         parent: _scaleController,
         curve: Curves.elasticOut,
-      ),
-    );
-
-    _rotationAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _rotationController,
-        curve: Curves.easeOut,
       ),
     );
 
@@ -68,7 +54,6 @@ class _CompletionCelebrationState extends State<CompletionCelebration>
 
   void _startAnimation() {
     _scaleController.forward();
-    _rotationController.repeat();
     _particlesController.forward();
 
     Future.delayed(const Duration(milliseconds: 2000), () {
@@ -81,7 +66,6 @@ class _CompletionCelebrationState extends State<CompletionCelebration>
   @override
   void dispose() {
     _scaleController.dispose();
-    _rotationController.dispose();
     _particlesController.dispose();
     super.dispose();
   }
@@ -115,30 +99,24 @@ class _CompletionCelebrationState extends State<CompletionCelebration>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              AnimatedBuilder(
-                animation: _rotationAnimation,
-                builder: (context, child) => Transform.rotate(
-                  angle: _rotationAnimation.value * 0.1,
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: AppColors.primaryGradient,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.success.withValues(alpha: 0.6),
-                          blurRadius: 40,
-                          spreadRadius: 10,
-                        ),
-                      ],
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: AppColors.primaryGradient,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.success.withValues(alpha: 0.6),
+                      blurRadius: 40,
+                      spreadRadius: 10,
                     ),
-                    child: const Icon(
-                      Icons.check_rounded,
-                      color: Colors.white,
-                      size: 80,
-                    ),
-                  ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.check_rounded,
+                  color: Colors.white,
+                  size: 80,
                 ),
               ),
               const SizedBox(height: 24),

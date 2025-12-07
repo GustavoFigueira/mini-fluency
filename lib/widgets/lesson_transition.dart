@@ -30,7 +30,8 @@ class _LessonTransitionState extends State<LessonTransition>
     super.initState();
 
     final wasCompleted = widget.previousLesson.status == LessonStatus.completed;
-    final isNowCompleted = widget.currentLesson.status == LessonStatus.completed;
+    final isNowCompleted =
+        widget.currentLesson.status == LessonStatus.completed;
 
     if (!wasCompleted && isNowCompleted) {
       _hasCompleted = true;

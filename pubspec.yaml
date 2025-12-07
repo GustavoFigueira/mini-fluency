@@ -7,41 +7,26 @@ environment:
   sdk: ^3.5.4
 
 dependencies:
-  ## Flutter SDK
   flutter:
     sdk: flutter
 
-  ## Community Packages
-  # Audio player for background music
   audioplayers: ^6.1.0
-  # Code generation annotations
   freezed_annotation: ^2.4.4
-  # Themed fonts
   google_fonts: ^6.2.1
-  # JSON serialization annotations
   json_annotation: ^4.9.0
-  # State management
+  package_info_plus: ^8.1.1
   provider: ^6.1.2
-  # Local cache
   shared_preferences: ^2.3.3
 
 dev_dependencies:
-  # Code generation
   build_runner: ^2.4.13
-  # Scripts and tasks runner
   derry: ^1.5.0
-  # Native launcher icons
   flutter_launcher_icons: ^0.14.3
-  # Code quality and linting
   flutter_lints: ^6.0.0
-  # Native splash screen
   flutter_native_splash: ^2.4.6
-  # Flutter Test
   flutter_test:
     sdk: flutter
-  # Code generation
   freezed: ^2.5.7
-  # JSON serialization
   json_serializable: ^6.8.0
 
 flutter:
