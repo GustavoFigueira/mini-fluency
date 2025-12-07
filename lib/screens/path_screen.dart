@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mini_fluency/core/core.dart';
+import 'package:mini_fluency/core/services/audio_service.dart';
 import 'package:mini_fluency/data/data.dart';
 import 'package:mini_fluency/models/models.dart';
+import 'package:mini_fluency/screens/settings_screen.dart';
 import 'package:mini_fluency/screens/tasks_screen.dart';
+import 'package:mini_fluency/widgets/lesson_transition.dart';
 import 'package:mini_fluency/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +20,10 @@ class _PathScreenState extends State<PathScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+  late ScrollController _scrollController;
+  final _audioService = AudioService();
+  Map<String, LessonStatus> _previousLessonStatuses = {};
+  bool _hasPlayedIntro = false;
 
   @override
   void initState() {
@@ -29,16 +36,56 @@ class _PathScreenState extends State<PathScreen>
       parent: _fadeController,
       curve: Curves.easeOut,
     );
+    _scrollController = ScrollController();
+    _audioService.initialize();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PathProvider>().loadPath();
+      if (!_hasPlayedIntro) {
+        _audioService.playIntro();
+        _hasPlayedIntro = true;
+      }
     });
   }
 
   @override
   void dispose() {
     _fadeController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _showLessonDetails(LessonModel lesson) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => LessonDetailsSheet(
+        lesson: lesson,
+        onStart: lesson.isAccessible
+            ? () {
+                Navigator.of(context).pop();
+                _navigateToTasks(lesson);
+              }
+            : null,
+      ),
+    );
+  }
+
+  void _showSoundPreferences() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const SoundPreferencesSheet(),
+    );
+  }
+
+  void _navigateToSettings() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SettingsScreen(),
+      ),
+    );
   }
 
   void _navigateToTasks(LessonModel lesson) {
@@ -61,14 +108,47 @@ class _PathScreenState extends State<PathScreen>
         ),
         transitionDuration: const Duration(milliseconds: 350),
       ),
-    );
+    ).then((_) {
+      _updatePreviousStatuses();
+    });
+  }
+
+  void _updatePreviousStatuses() {
+    final provider = context.read<PathProvider>();
+    final path = provider.path;
+    if (path == null) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() {
+        _previousLessonStatuses = {
+          for (final lesson in path.lessons)
+            lesson.id: lesson.status,
+        };
+      });
+    });
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
         body: DecoratedBox(
           decoration: const BoxDecoration(
-            gradient: AppColors.backgroundGradient,
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF1a1a3e),
+                Color(0xFF2d1b4e),
+                Color(0xFF1a1a3e),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
           child: SafeArea(
             child: Consumer<PathProvider>(
@@ -86,7 +166,7 @@ class _PathScreenState extends State<PathScreen>
       case PathState.error:
         return ErrorScreen(
           message: provider.errorMessage,
-          onRetry: provider.loadPath,
+          onRetry: () => provider.loadPath(),
         );
       case PathState.loaded:
         if (!_fadeController.isCompleted) {
@@ -101,121 +181,308 @@ class _PathScreenState extends State<PathScreen>
 
   Widget _buildPathContent(PathProvider provider) {
     final path = provider.path!;
+    final lessons = path.lessons;
+    final reversedLessons = lessons.reversed.toList();
 
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(child: _buildHeader(path.name, path.description)),
-        SliverToBoxAdapter(child: AppSpacing.verticalGapLG),
-        SliverPadding(
-          padding: AppSpacing.horizontalXL,
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final lesson = path.lessons[index];
-                final isLast = index == path.lessons.length - 1;
+    if (_previousLessonStatuses.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final currentPath = context.read<PathProvider>().path;
+        if (currentPath == null) return;
+        setState(() {
+          _previousLessonStatuses = {
+            for (final lesson in currentPath.lessons)
+              lesson.id: lesson.status,
+          };
+        });
+        _scrollToBottom();
+      });
+    }
 
-                return TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  duration: Duration(milliseconds: 400 + (index * 100)),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, value, child) => Opacity(
-                    opacity: value,
-                    child: Transform.translate(
-                      offset: Offset(0, 20 * (1 - value)),
-                      child: child,
-                    ),
-                  ),
-                  child: LessonNode(
-                    lesson: lesson,
-                    showConnector: !isLast,
-                    onTap: () => _navigateToTasks(lesson),
-                  ),
-                );
-              },
-              childCount: path.lessons.length,
+    return Stack(
+      children: [
+        _buildBackgroundDecorations(),
+        Column(
+          children: [
+            _buildHeader(path.name, path.description),
+            Expanded(
+              child: _buildLessonsPath(reversedLessons, provider),
             ),
-          ),
+            _buildBottomIcon(),
+          ],
         ),
-        SliverToBoxAdapter(child: AppSpacing.verticalGapXXL),
       ],
     );
   }
 
+  Widget _buildBackgroundDecorations() => Positioned.fill(
+        child: CustomPaint(
+          painter: StarsPainter(),
+        ),
+      );
+
   Widget _buildHeader(String title, String description) => Padding(
-        padding: AppSpacing.screenPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Row(
           children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.borderRadiusMD),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.route_rounded,
-                    color: AppColors.textPrimary,
-                    size: 24,
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.5),
                   ),
                 ),
-                AppSpacing.horizontalGapLG,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Trilha de Aprendizado',
-                        style: AppTypography.labelMedium.copyWith(
-                          color: AppColors.primary,
-                        ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Trilha de Aprendizado',
+                      style: AppTypography.labelSmall.copyWith(
+                        color: AppColors.primaryLight,
                       ),
-                      AppSpacing.verticalGapXS,
-                      Text(
-                        title,
-                        style: AppTypography.headlineMedium,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            AppSpacing.verticalGapLG,
-            Container(
-              padding: AppSpacing.paddingLG,
-              decoration: BoxDecoration(
-                color: AppColors.surface.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(AppSpacing.borderRadiusMD),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.info_outline_rounded,
-                    color: AppColors.secondary,
-                    size: 20,
-                  ),
-                  AppSpacing.horizontalGapMD,
-                  Expanded(
-                    child: Text(
-                      description,
-                      style: AppTypography.bodyMedium,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 2),
+                    Text(
+                      title,
+                      style: AppTypography.titleLarge.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
+            const SizedBox(width: 12),
+            _buildHeaderAction(Icons.settings_outlined, _navigateToSettings),
+            const SizedBox(width: 8),
+            _buildHeaderAction(Icons.volume_up_outlined, _showSoundPreferences),
           ],
         ),
       );
+
+  Widget _buildHeaderAction(IconData icon, VoidCallback onTap) =>
+      GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.2),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.4),
+            ),
+          ),
+          child: Icon(
+            icon,
+            color: AppColors.primaryLight,
+            size: 22,
+          ),
+        ),
+      );
+
+  Widget _buildLessonsPath(
+    List<LessonModel> reversedLessons,
+    PathProvider provider,
+  ) =>
+      ListView.builder(
+        controller: _scrollController,
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        physics: const BouncingScrollPhysics(),
+        itemCount: reversedLessons.length,
+        itemBuilder: (context, index) {
+          final lesson = reversedLessons[index];
+          final isEven = index.isEven;
+          final previousStatus = _previousLessonStatuses[lesson.id];
+
+          return TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: Duration(milliseconds: 400 + (index * 50)),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, child) => Opacity(
+              opacity: value,
+              child: Transform.translate(
+                offset: Offset(0, 20 * (1 - value)),
+                child: child,
+              ),
+            ),
+            child: LessonTransition(
+              previousLesson: LessonModel(
+                id: lesson.id,
+                title: lesson.title,
+                position: lesson.position,
+                status: previousStatus ?? lesson.status,
+                xp: lesson.xp,
+                estimatedMinutes: lesson.estimatedMinutes,
+                tasks: lesson.tasks,
+              ),
+              currentLesson: lesson,
+              child: _buildLessonNode(
+                lesson: lesson,
+                isEven: isEven,
+                showConnector: index < reversedLessons.length - 1,
+                nextIsEven: (index + 1).isEven,
+              ),
+            ),
+          );
+        },
+      );
+
+  Widget _buildLessonNode({
+    required LessonModel lesson,
+    required bool isEven,
+    required bool showConnector,
+    required bool nextIsEven,
+  }) {
+    final alignment = isEven ? Alignment.centerRight : Alignment.centerLeft;
+    final horizontalPadding = isEven
+        ? const EdgeInsets.only(right: 40, left: 100)
+        : const EdgeInsets.only(left: 40, right: 100);
+
+    return Column(
+      children: [
+        Padding(
+          padding: horizontalPadding,
+          child: Align(
+            alignment: alignment,
+            child: LessonNode(
+              lesson: lesson,
+              onTap: () => _showLessonDetails(lesson),
+              showConnector: false,
+              verticalLayout: true,
+            ),
+          ),
+        ),
+        if (showConnector)
+          CustomPaint(
+            size: const Size(double.infinity, 40),
+            painter: PathConnectorPainter(
+              fromRight: isEven,
+              toRight: nextIsEven,
+              color: _getConnectorColor(lesson.status),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Color _getConnectorColor(LessonStatus status) {
+    switch (status) {
+      case LessonStatus.completed:
+        return AppColors.success.withValues(alpha: 0.6);
+      case LessonStatus.current:
+        return AppColors.primary.withValues(alpha: 0.6);
+      case LessonStatus.locked:
+        return Colors.grey.withValues(alpha: 0.3);
+    }
+  }
+
+  Widget _buildBottomIcon() => Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.4),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: const Icon(
+            Icons.school_rounded,
+            color: Colors.white,
+            size: 32,
+          ),
+        ),
+      );
+}
+
+class PathConnectorPainter extends CustomPainter {
+  final bool fromRight;
+  final bool toRight;
+  final Color color;
+
+  PathConnectorPainter({
+    required this.fromRight,
+    required this.toRight,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 4
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final path = Path();
+
+    const nodeRadius = 40.0;
+    final startX = fromRight ? size.width - nodeRadius : nodeRadius;
+    final endX = toRight ? size.width - nodeRadius : nodeRadius;
+
+    path
+      ..moveTo(startX, 0)
+      ..quadraticBezierTo(
+        size.width / 2,
+        size.height / 2,
+        endX,
+        size.height,
+      );
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant PathConnectorPainter oldDelegate) =>
+      oldDelegate.fromRight != fromRight ||
+      oldDelegate.toRight != toRight ||
+      oldDelegate.color != color;
+}
+
+class StarsPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.white.withValues(alpha: 0.3);
+
+    final stars = [
+      Offset(size.width * 0.1, size.height * 0.15),
+      Offset(size.width * 0.85, size.height * 0.1),
+      Offset(size.width * 0.2, size.height * 0.35),
+      Offset(size.width * 0.9, size.height * 0.3),
+      Offset(size.width * 0.15, size.height * 0.55),
+      Offset(size.width * 0.8, size.height * 0.5),
+      Offset(size.width * 0.1, size.height * 0.75),
+      Offset(size.width * 0.95, size.height * 0.7),
+      Offset(size.width * 0.25, size.height * 0.9),
+      Offset(size.width * 0.75, size.height * 0.85),
+    ];
+
+    for (final star in stars) {
+      canvas.drawCircle(star, 2, paint);
+    }
+
+    paint.color = Colors.white.withValues(alpha: 0.15);
+    for (var i = 0; i < 20; i++) {
+      final x = (size.width * (i * 0.05 + 0.02)) % size.width;
+      final y = (size.height * (i * 0.07 + 0.03)) % size.height;
+      canvas.drawCircle(Offset(x, y), 1, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

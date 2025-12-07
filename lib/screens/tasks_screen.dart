@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini_fluency/core/core.dart';
+import 'package:mini_fluency/core/services/audio_service.dart';
 import 'package:mini_fluency/data/data.dart';
 import 'package:mini_fluency/models/models.dart';
 import 'package:mini_fluency/widgets/widgets.dart';
@@ -21,6 +22,9 @@ class _TasksScreenState extends State<TasksScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+  bool _showCelebration = false;
+  LessonModel? _previousLessonState;
+  final _audioService = AudioService();
 
   @override
   void initState() {
@@ -42,6 +46,25 @@ class _TasksScreenState extends State<TasksScreen>
     super.dispose();
   }
 
+  void _checkCompletion(PathProvider provider, LessonModel lesson) {
+    final completedCount = provider.getCompletedTasksCount(widget.lessonId);
+    final totalCount = provider.getTotalTasksCount(widget.lessonId);
+    final isCompleted = completedCount == totalCount && totalCount > 0;
+
+    if (!isCompleted) {
+      _showCelebration = false;
+      return;
+    }
+
+    if (_showCelebration) return;
+
+    final wasCompleted = _previousLessonState?.status == LessonStatus.completed;
+    if (wasCompleted) return;
+
+    setState(() => _showCelebration = true);
+    _audioService.playLessonCompleted();
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         body: DecoratedBox(
@@ -55,7 +78,23 @@ class _TasksScreenState extends State<TasksScreen>
                 if (lesson == null) {
                   return _buildNotFound();
                 }
-                return _buildContent(provider, lesson);
+
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _checkCompletion(provider, lesson);
+                  _previousLessonState = lesson;
+                });
+
+                return Stack(
+                  children: [
+                    _buildContent(provider, lesson),
+                    if (_showCelebration)
+                      CompletionCelebration(
+                        onComplete: () {
+                          setState(() => _showCelebration = false);
+                        },
+                      ),
+                  ],
+                );
               },
             ),
           ),
@@ -96,6 +135,8 @@ class _TasksScreenState extends State<TasksScreen>
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final task = lesson.tasks[index];
+                  final isCurrentlyCompleted = provider.isTaskCompleted(task.id);
+
                   return Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.md),
                     child: TweenAnimationBuilder<double>(
@@ -111,11 +152,18 @@ class _TasksScreenState extends State<TasksScreen>
                       ),
                       child: TaskCard(
                         task: task,
-                        isCompleted: provider.isTaskCompleted(task.id),
-                        onToggle: () => provider.toggleTaskCompletion(
-                          widget.lessonId,
-                          task.id,
-                        ),
+                        isCompleted: isCurrentlyCompleted,
+                        onToggle: () {
+                          final wasCompleted = provider.isTaskCompleted(task.id);
+                          provider.toggleTaskCompletion(
+                            widget.lessonId,
+                            task.id,
+                          );
+                          final isNowCompleted = provider.isTaskCompleted(task.id);
+                          if (!wasCompleted && isNowCompleted) {
+                            _audioService.playTaskCompleted();
+                          }
+                        },
                       ),
                     ),
                   );
