@@ -1,0 +1,99 @@
+# Mini Fluency
+
+Aplicativo de trilha de aprendizado de inglês desenvolvido para a Fluency Academy.
+
+## Requisitos
+
+- Flutter 3.38.7 ou superior
+- Dart SDK 3.5.4 ou superior
+
+## Instalação
+
+1. Clone o repositório
+2. Execute `flutter pub get`
+3. Execute `flutter pub run build_runner build --delete-conflicting-outputs`
+4. Execute `flutter run`
+
+## Funcionalidades
+
+- Trilha visual com nós representando lições
+- Estados: concluída (check verde), atual (brilho animado), bloqueada (cadeado)
+- Lista de tarefas por lição com toggle de conclusão
+- Indicador de progresso
+- Animações e transições suaves
+- Tema escuro
+
+## Arquitetura
+
+```
+lib/
+├── core/
+│   ├── core.dart                  # Barrel export
+│   ├── design_system/
+│   │   ├── design_system.dart     # Barrel export
+│   │   ├── colors.dart
+│   │   ├── spacing.dart
+│   │   └── typography.dart
+│   └── utils/
+│       ├── utils.dart             # Barrel export
+│       └── time_formatter.dart
+├── models/
+│   ├── models.dart                # Barrel export
+│   ├── path_model.dart
+│   ├── lesson_model.dart
+│   └── task_model.dart
+├── data/
+│   ├── data.dart                  # Barrel export
+│   ├── repositories/
+│   │   ├── repositories.dart      # Barrel export
+│   │   └── path_repository.dart
+│   └── providers/
+│       ├── providers.dart         # Barrel export
+│       └── path_provider.dart
+├── screens/
+│   ├── screens.dart               # Barrel export
+│   ├── path_screen.dart
+│   └── tasks_screen.dart
+├── widgets/
+│   ├── widgets.dart               # Barrel export
+│   └── ...
+└── main.dart
+```
+
+## Padrões Utilizados
+
+- **Barrel Exports**: Cada pasta possui um arquivo de export para imports limpos
+- **Freezed**: Models imutáveis com copyWith, equality e JSON serialization
+- **Provider**: Gerenciamento de estado com ChangeNotifier
+- **Design System**: Tokens centralizados (colors, typography, spacing)
+- **Clean Architecture**: Separação em camadas (data, models, screens, widgets)
+
+Exemplo de import com barrel export:
+
+```dart
+import '../core/core.dart';
+import '../models/models.dart';
+import '../data/data.dart';
+```
+
+## Geração de Código
+
+Para regenerar models após alterações:
+
+```bash
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+## Observações
+
+### Código em Inglês
+
+Código e documentação técnica em inglês para padronização.
+
+### Uso de IA
+
+Utilizei o Cursor como auxílio para acelerar o desenvolvimento. Parte do código foi gerada com IA, porém todo o projeto foi refinado manualmente, com atenção especial nas telas e arquitetura.
+
+## Tempo de Desenvolvimento
+
+Aproximadamente 4-5 horas

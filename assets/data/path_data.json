@@ -1,0 +1,74 @@
+{
+  "path": {
+    "id": "path_1",
+    "name": "Primeiros passos em inglês",
+    "description": "Uma trilha para você começar a se apresentar, cumprimentar e falar um pouco sobre você.",
+    "lessons": [
+      {
+        "id": "lesson_1",
+        "title": "Dar e receber boas-vindas",
+        "position": 1,
+        "status": "completed",
+        "xp": 20,
+        "estimatedMinutes": 5,
+        "tasks": [
+          {"id": "task_1", "title": "Ouça e repita: Hello!", "type": "listen_repeat", "estimatedSeconds": 60},
+          {"id": "task_2", "title": "Escolha a opção correta para 'Welcome!'", "type": "multiple_choice", "estimatedSeconds": 90},
+          {"id": "task_3", "title": "Complete as frases de boas-vindas", "type": "fill_in_the_blanks", "estimatedSeconds": 120}
+        ]
+      },
+      {
+        "id": "lesson_2",
+        "title": "Se apresentar",
+        "position": 2,
+        "status": "current",
+        "xp": 25,
+        "estimatedMinutes": 6,
+        "tasks": [
+          {"id": "task_4", "title": "Ouça e repita: My name is...", "type": "listen_repeat", "estimatedSeconds": 60},
+          {"id": "task_5", "title": "Monte a frase para se apresentar", "type": "ordering", "estimatedSeconds": 90},
+          {"id": "task_6", "title": "Role-play: se apresente para um local", "type": "role_play", "estimatedSeconds": 150}
+        ]
+      },
+      {
+        "id": "lesson_3",
+        "title": "Falar da sua nacionalidade",
+        "position": 3,
+        "status": "locked",
+        "xp": 25,
+        "estimatedMinutes": 6,
+        "tasks": [
+          {"id": "task_7", "title": "Ouça e repita: I am Brazilian", "type": "listen_repeat", "estimatedSeconds": 60},
+          {"id": "task_8", "title": "Complete: I am from...", "type": "fill_in_the_blanks", "estimatedSeconds": 120},
+          {"id": "task_9", "title": "Escolha a nacionalidade correta", "type": "multiple_choice", "estimatedSeconds": 90}
+        ]
+      },
+      {
+        "id": "lesson_4",
+        "title": "Falar sobre idade",
+        "position": 4,
+        "status": "locked",
+        "xp": 20,
+        "estimatedMinutes": 5,
+        "tasks": [
+          {"id": "task_10", "title": "Ouça e repita: I am 30 years old", "type": "listen_repeat", "estimatedSeconds": 60},
+          {"id": "task_11", "title": "Monte a frase com a idade correta", "type": "ordering", "estimatedSeconds": 90}
+        ]
+      },
+      {
+        "id": "lesson_5",
+        "title": "Encerrar uma conversa",
+        "position": 5,
+        "status": "locked",
+        "xp": 20,
+        "estimatedMinutes": 5,
+        "tasks": [
+          {"id": "task_12", "title": "Ouça e repita: Nice to meet you!", "type": "listen_repeat", "estimatedSeconds": 60},
+          {"id": "task_13", "title": "Escolha a melhor forma de se despedir", "type": "multiple_choice", "estimatedSeconds": 90},
+          {"id": "task_14", "title": "Role-play: encerrando uma conversa", "type": "role_play", "estimatedSeconds": 150}
+        ]
+      }
+    ]
+  }
+}
+
