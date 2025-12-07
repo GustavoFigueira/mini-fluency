@@ -1,10 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:mini_fluency/models/models.dart';
 
-import '../../models/models.dart';
-
-/// Repository responsible for loading and managing path data
 class PathRepository {
   static const String _assetPath = 'assets/data/path_data.json';
 

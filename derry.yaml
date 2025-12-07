@@ -1,0 +1,33 @@
+# Clean
+clean:
+  - flutter clean
+
+# Pub get
+get:
+  - flutter pub get
+
+# Run Build Runner Build
+build: dart run build_runner build --delete-conflicting-outputs
+
+# Build the web project
+build_web:
+  - flutter build web --release --no-tree-shake-icons --wasm
+
+# Run Build Runner Watch
+watch: dart run build_runner watch --delete-conflicting-outputs
+
+# Run Tests Coverage
+coverage:
+  - flutter test --coverage
+
+# Generate Native Splash
+splash:
+  - dart run flutter_native_splash:create
+
+# Generate Launcher Icon
+launcher_icon:
+  - dart run flutter_launcher_icons
+
+# Format code
+format:
+  - dart format lib/ test/

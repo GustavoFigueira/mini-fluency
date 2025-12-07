@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mini_fluency/core/core.dart';
 
-import '../core/core.dart';
-
-/// Custom progress indicator showing completed tasks count
 class TaskProgressIndicator extends StatelessWidget {
   final int completed;
   final int total;
@@ -16,46 +14,42 @@ class TaskProgressIndicator extends StatelessWidget {
   double get _progress => total > 0 ? completed / total : 0;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        gradient: AppColors.cardGradient,
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusMD),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Progresso',
-                style: AppTypography.labelMedium,
-              ),
-              Text(
-                '$completed de $total tarefas',
-                style: AppTypography.labelMedium.copyWith(
-                  color: AppColors.primary,
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
+        decoration: BoxDecoration(
+          gradient: AppColors.cardGradient,
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusMD),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Progresso',
+                  style: AppTypography.labelMedium,
                 ),
-              ),
-            ],
-          ),
-          AppSpacing.verticalGapSM,
-          _buildProgressBar(),
-        ],
-      ),
-    );
-  }
+                Text(
+                  '$completed de $total tarefas',
+                  style: AppTypography.labelMedium.copyWith(
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+            AppSpacing.verticalGapSM,
+            _buildProgressBar(),
+          ],
+        ),
+      );
 
-  Widget _buildProgressBar() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Stack(
+  Widget _buildProgressBar() => LayoutBuilder(
+        builder: (context, constraints) => Stack(
           children: [
             Container(
               height: 8,
@@ -85,8 +79,6 @@ class TaskProgressIndicator extends StatelessWidget {
               ),
             ),
           ],
-        );
-      },
-    );
-  }
+        ),
+      );
 }

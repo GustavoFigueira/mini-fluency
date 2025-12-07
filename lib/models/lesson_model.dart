@@ -1,10 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'task_model.dart';
+import 'package:mini_fluency/models/task_model.dart';
 
 part 'lesson_model.freezed.dart';
 part 'lesson_model.g.dart';
 
-/// Represents a lesson in the learning path
 @freezed
 class LessonModel with _$LessonModel {
   const LessonModel._();
@@ -27,7 +26,6 @@ class LessonModel with _$LessonModel {
   bool get isAccessible => status != LessonStatus.locked;
 }
 
-/// Status of a lesson in the learning path
 @JsonEnum(valueField: 'value')
 enum LessonStatus {
   @JsonValue('completed')

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mini_fluency/core/core.dart';
+import 'package:mini_fluency/models/models.dart';
 
-import '../core/core.dart';
-import '../models/models.dart';
-
-/// Card widget displaying a single task with completion toggle
 class TaskCard extends StatefulWidget {
   final TaskModel task;
   final bool isCompleted;
@@ -76,57 +74,51 @@ class _TaskCardState extends State<TaskCard>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _scaleAnimation,
-      builder: (context, child) {
-        return Transform.scale(
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) => Transform.scale(
           scale: _scaleAnimation.value,
           child: child,
-        );
-      },
-      child: GestureDetector(
-        onTap: _handleTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: AppSpacing.paddingLG,
-          decoration: BoxDecoration(
-            gradient: widget.isCompleted
-                ? LinearGradient(
-                    colors: [
-                      AppColors.success.withValues(alpha: 0.15),
-                      AppColors.success.withValues(alpha: 0.05),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  )
-                : AppColors.cardGradient,
-            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusMD),
-            border: Border.all(
-              color: widget.isCompleted
-                  ? AppColors.success.withValues(alpha: 0.4)
-                  : AppColors.border,
-              width: 1.5,
+        ),
+        child: GestureDetector(
+          onTap: _handleTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: AppSpacing.paddingLG,
+            decoration: BoxDecoration(
+              gradient: widget.isCompleted
+                  ? LinearGradient(
+                      colors: [
+                        AppColors.success.withValues(alpha: 0.15),
+                        AppColors.success.withValues(alpha: 0.05),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : AppColors.cardGradient,
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusMD),
+              border: Border.all(
+                color: widget.isCompleted
+                    ? AppColors.success.withValues(alpha: 0.4)
+                    : AppColors.border,
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                _buildCheckbox(),
+                AppSpacing.horizontalGapLG,
+                Expanded(child: _buildTaskInfo()),
+                _buildTypeIcon(),
+              ],
             ),
           ),
-          child: Row(
-            children: [
-              _buildCheckbox(),
-              AppSpacing.horizontalGapLG,
-              Expanded(child: _buildTaskInfo()),
-              _buildTypeIcon(),
-            ],
-          ),
         ),
-      ),
-    );
-  }
+      );
 
-  Widget _buildCheckbox() {
-    return AnimatedBuilder(
-      animation: _checkAnimation,
-      builder: (context, child) {
-        return Container(
+  Widget _buildCheckbox() => AnimatedBuilder(
+        animation: _checkAnimation,
+        builder: (context, child) => Container(
           width: 28,
           height: 28,
           decoration: BoxDecoration(
@@ -156,60 +148,56 @@ class _TaskCardState extends State<TaskCard>
                   ),
                 )
               : null,
-        );
-      },
-    );
-  }
+        ),
+      );
 
-  Widget _buildTaskInfo() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          widget.task.title,
-          style: AppTypography.bodyLarge.copyWith(
-            color: widget.isCompleted
-                ? AppColors.textSecondary
-                : AppColors.textPrimary,
-            decoration: widget.isCompleted ? TextDecoration.lineThrough : null,
-            decorationColor: AppColors.textMuted,
+  Widget _buildTaskInfo() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.task.title,
+            style: AppTypography.bodyLarge.copyWith(
+              color: widget.isCompleted
+                  ? AppColors.textSecondary
+                  : AppColors.textPrimary,
+              decoration:
+                  widget.isCompleted ? TextDecoration.lineThrough : null,
+              decorationColor: AppColors.textMuted,
+            ),
           ),
-        ),
-        AppSpacing.verticalGapXS,
-        Row(
-          children: [
-            _buildMetaChip(
-              icon: Icons.schedule_rounded,
-              label: TimeFormatter.formatSeconds(widget.task.estimatedSeconds),
-            ),
-            AppSpacing.horizontalGapSM,
-            _buildMetaChip(
-              icon: _getTypeIcon(widget.task.type),
-              label: widget.task.type.displayName,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+          AppSpacing.verticalGapXS,
+          Row(
+            children: [
+              _buildMetaChip(
+                icon: Icons.schedule_rounded,
+                label:
+                    TimeFormatter.formatSeconds(widget.task.estimatedSeconds),
+              ),
+              AppSpacing.horizontalGapSM,
+              _buildMetaChip(
+                icon: _getTypeIcon(widget.task.type),
+                label: widget.task.type.displayName,
+              ),
+            ],
+          ),
+        ],
+      );
 
-  Widget _buildMetaChip({required IconData icon, required String label}) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icon,
-          size: 12,
-          color: AppColors.textMuted,
-        ),
-        AppSpacing.horizontalGapXS,
-        Text(
-          label,
-          style: AppTypography.caption,
-        ),
-      ],
-    );
-  }
+  Widget _buildMetaChip({required IconData icon, required String label}) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 12,
+            color: AppColors.textMuted,
+          ),
+          AppSpacing.horizontalGapXS,
+          Text(
+            label,
+            style: AppTypography.caption,
+          ),
+        ],
+      );
 
   IconData _getTypeIcon(TaskType type) {
     switch (type) {
@@ -226,19 +214,17 @@ class _TaskCardState extends State<TaskCard>
     }
   }
 
-  Widget _buildTypeIcon() {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusSM),
-      ),
-      child: Icon(
-        _getTypeIcon(widget.task.type),
-        size: 20,
-        color: AppColors.primary,
-      ),
-    );
-  }
+  Widget _buildTypeIcon() => Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusSM),
+        ),
+        child: Icon(
+          _getTypeIcon(widget.task.type),
+          size: 20,
+          color: AppColors.primary,
+        ),
+      );
 }

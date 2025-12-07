@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mini_fluency/core/core.dart';
+import 'package:mini_fluency/data/data.dart';
+import 'package:mini_fluency/models/models.dart';
+import 'package:mini_fluency/screens/tasks_screen.dart';
+import 'package:mini_fluency/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
-import '../core/core.dart';
-import '../data/data.dart';
-import '../models/models.dart';
-import '../widgets/widgets.dart';
-import 'tasks_screen.dart';
-
-/// Main screen displaying the learning path with all lessons
 class PathScreen extends StatefulWidget {
   const PathScreen({super.key});
 
@@ -48,40 +46,37 @@ class _PathScreenState extends State<PathScreen>
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
             TasksScreen(lessonId: lesson.id),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(1.0, 0.0),
-              end: Offset.zero,
-            ).animate(CurvedAnimation(
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(1.0, 0.0),
+            end: Offset.zero,
+          ).animate(
+            CurvedAnimation(
               parent: animation,
               curve: Curves.easeOutCubic,
-            )),
-            child: child,
-          );
-        },
+            ),
+          ),
+          child: child,
+        ),
         transitionDuration: const Duration(milliseconds: 350),
       ),
     );
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.backgroundGradient,
-        ),
-        child: SafeArea(
-          child: Consumer<PathProvider>(
-            builder: (context, provider, child) {
-              return _buildContent(provider);
-            },
+  Widget build(BuildContext context) => Scaffold(
+        body: DecoratedBox(
+          decoration: const BoxDecoration(
+            gradient: AppColors.backgroundGradient,
+          ),
+          child: SafeArea(
+            child: Consumer<PathProvider>(
+              builder: (context, provider, child) => _buildContent(provider),
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
   Widget _buildContent(PathProvider provider) {
     switch (provider.state) {
@@ -91,7 +86,7 @@ class _PathScreenState extends State<PathScreen>
       case PathState.error:
         return ErrorScreen(
           message: provider.errorMessage,
-          onRetry: () => provider.loadPath(),
+          onRetry: provider.loadPath,
         );
       case PathState.loaded:
         if (!_fadeController.isCompleted) {
@@ -124,15 +119,13 @@ class _PathScreenState extends State<PathScreen>
                   tween: Tween(begin: 0.0, end: 1.0),
                   duration: Duration(milliseconds: 400 + (index * 100)),
                   curve: Curves.easeOutCubic,
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Transform.translate(
-                        offset: Offset(0, 20 * (1 - value)),
-                        child: child,
-                      ),
-                    );
-                  },
+                  builder: (context, value, child) => Opacity(
+                    opacity: value,
+                    child: Transform.translate(
+                      offset: Offset(0, 20 * (1 - value)),
+                      child: child,
+                    ),
+                  ),
                   child: LessonNode(
                     lesson: lesson,
                     showConnector: !isLast,
@@ -149,82 +142,80 @@ class _PathScreenState extends State<PathScreen>
     );
   }
 
-  Widget _buildHeader(String title, String description) {
-    return Padding(
-      padding: AppSpacing.screenPadding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.borderRadiusMD),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.route_rounded,
-                  color: AppColors.textPrimary,
-                  size: 24,
-                ),
-              ),
-              AppSpacing.horizontalGapLG,
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Trilha de Aprendizado',
-                      style: AppTypography.labelMedium.copyWith(
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    AppSpacing.verticalGapXS,
-                    Text(
-                      title,
-                      style: AppTypography.headlineMedium,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          AppSpacing.verticalGapLG,
-          Container(
-            padding: AppSpacing.paddingLG,
-            decoration: BoxDecoration(
-              color: AppColors.surface.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusMD),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Row(
+  Widget _buildHeader(String title, String description) => Padding(
+        padding: AppSpacing.screenPadding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Icon(
-                  Icons.info_outline_rounded,
-                  color: AppColors.secondary,
-                  size: 20,
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusMD),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.route_rounded,
+                    color: AppColors.textPrimary,
+                    size: 24,
+                  ),
                 ),
-                AppSpacing.horizontalGapMD,
+                AppSpacing.horizontalGapLG,
                 Expanded(
-                  child: Text(
-                    description,
-                    style: AppTypography.bodyMedium,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Trilha de Aprendizado',
+                        style: AppTypography.labelMedium.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      AppSpacing.verticalGapXS,
+                      Text(
+                        title,
+                        style: AppTypography.headlineMedium,
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            AppSpacing.verticalGapLG,
+            Container(
+              padding: AppSpacing.paddingLG,
+              decoration: BoxDecoration(
+                color: AppColors.surface.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(AppSpacing.borderRadiusMD),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    color: AppColors.secondary,
+                    size: 20,
+                  ),
+                  AppSpacing.horizontalGapMD,
+                  Expanded(
+                    child: Text(
+                      description,
+                      style: AppTypography.bodyMedium,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
 }

@@ -1,12 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:mini_fluency/data/repositories/repositories.dart';
+import 'package:mini_fluency/models/models.dart';
 
-import '../../models/models.dart';
-import '../repositories/repositories.dart';
-
-/// State of the path data loading process
 enum PathState { initial, loading, loaded, error }
 
-/// Provider for managing the learning path state
 class PathProvider extends ChangeNotifier {
   final PathRepository _repository;
 
@@ -55,16 +52,12 @@ class PathProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool isTaskCompleted(String taskId) {
-    return _taskCompletionState[taskId] ?? false;
-  }
+  bool isTaskCompleted(String taskId) => _taskCompletionState[taskId] ?? false;
 
-  LessonModel? getLessonById(String lessonId) {
-    return _path?.lessons.firstWhere(
-      (lesson) => lesson.id == lessonId,
-      orElse: () => throw Exception('Lesson not found'),
-    );
-  }
+  LessonModel? getLessonById(String lessonId) => _path?.lessons.firstWhere(
+        (lesson) => lesson.id == lessonId,
+        orElse: () => throw Exception('Lesson not found'),
+      );
 
   int getCompletedTasksCount(String lessonId) {
     final lesson = getLessonById(lessonId);

@@ -1,10 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'lesson_model.dart';
+import 'package:mini_fluency/models/lesson_model.dart';
 
 part 'path_model.freezed.dart';
 part 'path_model.g.dart';
 
-/// Represents a learning path containing multiple lessons
 @freezed
 class PathModel with _$PathModel {
   const PathModel._();

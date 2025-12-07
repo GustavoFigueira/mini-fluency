@@ -1,0 +1,17 @@
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logos/fluency-icon.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/images/logos/fluency-icon.png"
+    background_color: "#0F0F23"
+    theme_color: "#6366F1"
+  windows:
+    generate: true
+    image_path: "assets/images/logos/fluency-icon.png"
+    icon_size: 48
+  macos:
+    generate: true
+    image_path: "assets/images/logos/fluency-icon.png"
