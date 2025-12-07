@@ -207,6 +207,7 @@ class _LessonNodeState extends State<LessonNode>
 
   Widget _buildLessonInfo({required bool vertical}) {
     final isLocked = widget.lesson.status == LessonStatus.locked;
+    final colors = context.themeColors;
 
     return Opacity(
       opacity: isLocked ? 0.5 : 1.0,
@@ -218,7 +219,11 @@ class _LessonNodeState extends State<LessonNode>
           Text(
             widget.lesson.title,
             style: AppTypography.titleMedium.copyWith(
-              color: isLocked ? AppColors.textMuted : AppColors.textPrimary,
+              color: isLocked
+                  ? colors.textMuted
+                  : colors.isDark
+                      ? colors.textPrimary
+                      : const Color(0xFF4A2C5A),
             ),
             textAlign: vertical ? TextAlign.center : null,
           ),
@@ -229,13 +234,13 @@ class _LessonNodeState extends State<LessonNode>
               _buildInfoChip(
                 icon: Icons.bolt_rounded,
                 label: '${widget.lesson.xp} XP',
-                color: AppColors.warning,
+                color: colors.warning,
               ),
               const SizedBox(width: 8),
               _buildInfoChip(
                 icon: Icons.schedule_rounded,
                 label: '${widget.lesson.estimatedMinutes} min',
-                color: AppColors.secondary,
+                color: colors.secondary,
               ),
             ],
           ),

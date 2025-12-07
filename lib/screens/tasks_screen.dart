@@ -66,10 +66,13 @@ class _TasksScreenState extends State<TasksScreen>
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
+    return Scaffold(
         body: DecoratedBox(
-          decoration: const BoxDecoration(
-            gradient: AppColors.backgroundGradient,
+          decoration: BoxDecoration(
+            gradient: colors.backgroundGradient,
           ),
           child: SafeArea(
             child: Consumer<PathProvider>(
@@ -100,14 +103,19 @@ class _TasksScreenState extends State<TasksScreen>
           ),
         ),
       );
+  }
 
-  Widget _buildNotFound() => Center(
+  Widget _buildNotFound() {
+    final colors = context.themeColors;
+
+    return Center(
         child: Text(
           'Lição não encontrada',
           style:
-              AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary),
+              AppTypography.bodyLarge.copyWith(color: colors.textSecondary),
         ),
       );
+  }
 
   Widget _buildContent(PathProvider provider, LessonModel lesson) {
     final completedCount = provider.getCompletedTasksCount(widget.lessonId);
@@ -173,7 +181,10 @@ class _TasksScreenState extends State<TasksScreen>
     );
   }
 
-  Widget _buildHeader(LessonModel lesson) => Padding(
+  Widget _buildHeader(LessonModel lesson) {
+    final colors = context.themeColors;
+
+    return Padding(
         padding: AppSpacing.screenPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,13 +200,15 @@ class _TasksScreenState extends State<TasksScreen>
                       Text(
                         'Lição ${lesson.position}',
                         style: AppTypography.labelMedium.copyWith(
-                          color: AppColors.primary,
+                          color: colors.primary,
                         ),
                       ),
                       AppSpacing.verticalGapXS,
                       Text(
                         lesson.title,
-                        style: AppTypography.headlineMedium,
+                        style: AppTypography.headlineMedium.copyWith(
+                          color: colors.textPrimary,
+                        ),
                       ),
                     ],
                   ),
@@ -207,8 +220,12 @@ class _TasksScreenState extends State<TasksScreen>
           ],
         ),
       );
+  }
 
-  Widget _buildBackButton() => GestureDetector(
+  Widget _buildBackButton() {
+    final colors = context.themeColors;
+
+    return GestureDetector(
         onTap: () => ButtonTapHandler.handleTap(
           () => Navigator.of(context).pop(),
         ),
@@ -216,50 +233,55 @@ class _TasksScreenState extends State<TasksScreen>
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: colors.surface,
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusMD),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: colors.border),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.arrow_back_rounded,
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
             size: 20,
           ),
         ),
       );
+  }
 
-  Widget _buildXpBadge(int xp) => Container(
+  Widget _buildXpBadge(int xp) {
+    final colors = context.themeColors;
+
+    return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.warning.withValues(alpha: 0.2),
-              AppColors.warning.withValues(alpha: 0.1),
+              colors.warning.withValues(alpha: 0.2),
+              colors.warning.withValues(alpha: 0.1),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusFull),
           border: Border.all(
-            color: AppColors.warning.withValues(alpha: 0.3),
+            color: colors.warning.withValues(alpha: 0.3),
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.bolt_rounded,
-              color: AppColors.warning,
+              color: colors.warning,
               size: 18,
             ),
             AppSpacing.horizontalGapXS,
             Text(
               '$xp XP',
               style: AppTypography.labelLarge.copyWith(
-                color: AppColors.warning,
+                color: colors.warning,
               ),
             ),
           ],
         ),
       );
+  }
 }

@@ -93,7 +93,8 @@ class _PathScreenState extends State<PathScreen>
   }
 
   void _navigateToTasks(LessonModel lesson) {
-    Navigator.of(context).push(
+    Navigator.of(context)
+        .push(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
             TasksScreen(lessonId: lesson.id),
@@ -112,7 +113,8 @@ class _PathScreenState extends State<PathScreen>
         ),
         transitionDuration: const Duration(milliseconds: 350),
       ),
-    ).then((_) {
+    )
+        .then((_) {
       _updatePreviousStatuses();
     });
   }
@@ -126,8 +128,7 @@ class _PathScreenState extends State<PathScreen>
       if (!mounted) return;
       setState(() {
         _previousLessonStatuses = {
-          for (final lesson in path.lessons)
-            lesson.id: lesson.status,
+          for (final lesson in path.lessons) lesson.id: lesson.status,
         };
       });
     });
@@ -141,26 +142,22 @@ class _PathScreenState extends State<PathScreen>
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: DecoratedBox(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFF1a1a3e),
-                Color(0xFF2d1b4e),
-                Color(0xFF1a1a3e),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: SafeArea(
-            child: Consumer<PathProvider>(
-              builder: (context, provider, child) => _buildContent(provider),
-            ),
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
+    return Scaffold(
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: colors.backgroundGradient,
+        ),
+        child: SafeArea(
+          child: Consumer<PathProvider>(
+            builder: (context, provider, child) => _buildContent(provider),
           ),
         ),
-      );
+      ),
+    );
+  }
 
   Widget _buildContent(PathProvider provider) {
     switch (provider.state) {
@@ -195,8 +192,7 @@ class _PathScreenState extends State<PathScreen>
         if (currentPath == null) return;
         setState(() {
           _previousLessonStatuses = {
-            for (final lesson in currentPath.lessons)
-              lesson.id: lesson.status,
+            for (final lesson in currentPath.lessons) lesson.id: lesson.status,
           };
         });
         _scrollToBottom();
@@ -219,78 +215,89 @@ class _PathScreenState extends State<PathScreen>
     );
   }
 
-  Widget _buildBackgroundDecorations() => Positioned.fill(
+  Widget _buildBackgroundDecorations() {
+    final colors = context.themeColors;
+
+    return Positioned.fill(
         child: CustomPaint(
-          painter: StarsPainter(),
+          painter: StarsPainter(isDark: colors.isDark),
         ),
       );
+  }
 
-  Widget _buildHeader(String title, String description) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.5),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Trilha de Aprendizado',
-                      style: AppTypography.labelSmall.copyWith(
-                        color: AppColors.primaryLight,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      title,
-                      style: AppTypography.titleLarge.copyWith(
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ],
+  Widget _buildHeader(String title, String description) {
+    final colors = context.themeColors;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              decoration: BoxDecoration(
+                color: colors.primary.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: colors.primary.withValues(alpha: 0.5),
                 ),
               ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Trilha de Aprendizado',
+                    style: AppTypography.labelSmall.copyWith(
+                      color: colors.primaryLight,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    title,
+                    style: AppTypography.titleLarge.copyWith(
+                      color: colors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(width: 12),
-            _buildHeaderAction(Icons.settings_outlined, _navigateToSettings),
-            const SizedBox(width: 8),
-            _buildHeaderAction(Icons.volume_up_outlined, _showSoundPreferences),
-          ],
-        ),
-      );
+          ),
+          const SizedBox(width: 12),
+          _buildHeaderAction(Icons.settings_outlined, _navigateToSettings),
+          const SizedBox(width: 8),
+          _buildHeaderAction(Icons.volume_up_outlined, _showSoundPreferences),
+        ],
+      ),
+    );
+  }
 
-  Widget _buildHeaderAction(IconData icon, VoidCallback onTap) =>
-      GestureDetector(
-        onTap: () => ButtonTapHandler.handleTap(onTap),
-        child: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.2),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.4),
-            ),
-          ),
-          child: Icon(
-            icon,
-            color: AppColors.primaryLight,
-            size: 22,
+  Widget _buildHeaderAction(IconData icon, VoidCallback onTap) {
+    final colors = context.themeColors;
+
+    return GestureDetector(
+      onTap: () => ButtonTapHandler.handleTap(onTap),
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: colors.primary.withValues(alpha: 0.2),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: colors.primary.withValues(alpha: 0.4),
           ),
         ),
-      );
+        child: Icon(
+          icon,
+          color: colors.primaryLight,
+          size: 22,
+        ),
+      ),
+    );
+  }
 
   Widget _buildLessonsPath(
     List<LessonModel> reversedLessons,
@@ -298,7 +305,7 @@ class _PathScreenState extends State<PathScreen>
   ) =>
       ListView.builder(
         controller: _scrollController,
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: const EdgeInsets.symmetric(vertical: 20).copyWith(bottom: 40),
         physics: const BouncingScrollPhysics(),
         itemCount: reversedLessons.length,
         itemBuilder: (context, index) {
@@ -380,39 +387,45 @@ class _PathScreenState extends State<PathScreen>
   }
 
   Color _getConnectorColor(LessonStatus status) {
+    final colors = context.themeColors;
+
     switch (status) {
       case LessonStatus.completed:
-        return AppColors.success.withValues(alpha: 0.6);
+        return colors.success.withValues(alpha: 0.6);
       case LessonStatus.current:
-        return AppColors.primary.withValues(alpha: 0.6);
+        return colors.primary.withValues(alpha: 0.6);
       case LessonStatus.locked:
         return Colors.grey.withValues(alpha: 0.3);
     }
   }
 
-  Widget _buildBottomIcon() => Padding(
-        padding: const EdgeInsets.only(bottom: 20),
-        child: Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.4),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: const Icon(
-            Icons.school_rounded,
-            color: Colors.white,
-            size: 32,
-          ),
+  Widget _buildBottomIcon() {
+    final colors = context.themeColors;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Container(
+        width: 64,
+        height: 64,
+        decoration: BoxDecoration(
+          gradient: colors.primaryGradient,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: colors.primary.withValues(alpha: 0.4),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-      );
+        child: const Icon(
+          Icons.school_rounded,
+          color: Colors.white,
+          size: 32,
+        ),
+      ),
+    );
+  }
 }
 
 class PathConnectorPainter extends CustomPainter {
@@ -460,9 +473,17 @@ class PathConnectorPainter extends CustomPainter {
 }
 
 class StarsPainter extends CustomPainter {
+  final bool isDark;
+
+  StarsPainter({required this.isDark});
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withValues(alpha: 0.3);
+    final starColor = isDark
+        ? Colors.white.withValues(alpha: 0.3)
+        : const Color(0xFF6366F1).withValues(alpha: 0.4);
+
+    final paint = Paint()..color = starColor;
 
     final stars = [
       Offset(size.width * 0.1, size.height * 0.15),
@@ -481,7 +502,9 @@ class StarsPainter extends CustomPainter {
       canvas.drawCircle(star, 2, paint);
     }
 
-    paint.color = Colors.white.withValues(alpha: 0.15);
+    paint.color = isDark
+        ? Colors.white.withValues(alpha: 0.15)
+        : const Color(0xFF6366F1).withValues(alpha: 0.25);
     for (var i = 0; i < 20; i++) {
       final x = (size.width * (i * 0.05 + 0.02)) % size.width;
       final y = (size.height * (i * 0.07 + 0.03)) % size.height;
@@ -490,5 +513,6 @@ class StarsPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant StarsPainter oldDelegate) =>
+      oldDelegate.isDark != isDark;
 }
