@@ -69,7 +69,7 @@ class _LessonNodeState extends State<LessonNode>
         mainAxisSize: MainAxisSize.min,
         children: [
           GestureDetector(
-            onTap: widget.lesson.isAccessible ? widget.onTap : null,
+            onTap: () => ButtonTapHandler.handleTap(widget.onTap),
             child: _buildNodeCircle(vertical: true),
           ),
           const SizedBox(height: 12),
@@ -82,7 +82,7 @@ class _LessonNodeState extends State<LessonNode>
     return Column(
       children: [
         GestureDetector(
-          onTap: widget.lesson.isAccessible ? widget.onTap : null,
+          onTap: () => ButtonTapHandler.handleTap(widget.onTap),
           child: Row(
             children: [
               _buildNodeCircle(vertical: false),
@@ -183,26 +183,10 @@ class _LessonNodeState extends State<LessonNode>
         );
       case LessonStatus.current:
         if (isFirstLesson && vertical) {
-          return Stack(
-            alignment: Alignment.center,
-            clipBehavior: Clip.none,
-            children: [
-              Text(
-                '${widget.lesson.position}',
-                style: AppTypography.headlineMedium.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Positioned(
-                top: -12,
-                child: Icon(
-                  Icons.school_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            ],
+          return Icon(
+            Icons.school_rounded,
+            color: Colors.white,
+            size: 48,
           );
         }
         return Text(

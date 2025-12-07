@@ -97,14 +97,15 @@ Código e documentação técnica em inglês para padronização.
 
 ### Uso de IA
 
-Utilizei o Cursor como auxílio para acelerar o desenvolvimento. Parte do código foi gerada com IA, porém todo o projeto foi refinado manualmente, com atenção especial nas telas e arquitetura, utilizando minha  com usabilidade e experiência do usuário.
+Utilizei o Cursor como auxílio para acelerar o desenvolvimento. Parte do código foi gerada com IA, porém todo o projeto foi refinado manualmente, com atenção especial nas telas e arquitetura, utilizando minha com usabilidade e experiência do usuário.
 
 ### Trilha Sonora
 
 O aplicativo inclui uma trilha sonora de fundo sem direitos autorais, similar ao app Fluency. Os arquivos de áudio estão localizados em `assets/audio/`:
+
 - `background_music.mp3` - Música de fundo em loop
 - `intro.mp3` - Som de introdução ao carregar a home pela primeira vez
-- `finish-task.mp3` - Efeito sonoro ao completar uma tarefa
+- `button-tap-pop.mp3` - Efeito sonoro em todos os cliques de botões e interações
 - `completed.mp3` - Efeito sonoro ao finalizar uma missão completa
 
 ## Tempo de Desenvolvimento

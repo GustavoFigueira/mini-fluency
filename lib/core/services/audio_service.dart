@@ -105,15 +105,14 @@ class AudioService {
     }
   }
 
-  void playTaskCompleted() {
+  Future<void> playButtonTap() async {
     if (!_isSfxEnabled) return;
 
     try {
-      _sfxPlayer
-        ..stop()
-        ..play(AssetSource('audio/finish-task.mp3'));
+      await _sfxPlayer.stop();
+      await _sfxPlayer.play(AssetSource('audio/button-tap-pop.mp3'));
     } catch (e) {
-      debugPrint('Error playing task completed: $e');
+      debugPrint('Error playing button tap: $e');
     }
   }
 

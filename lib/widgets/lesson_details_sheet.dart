@@ -15,7 +15,7 @@ class LessonDetailsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DecoratedBox(
         decoration: const BoxDecoration(
-          gradient: AppColors.backgroundGradient,
+          color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: SafeArea(
@@ -31,6 +31,10 @@ class LessonDetailsSheet extends StatelessWidget {
                     _buildHeader(),
                     const SizedBox(height: 24),
                     _buildInfo(),
+                    if (!lesson.isAccessible) ...[
+                      const SizedBox(height: 16),
+                      _buildLockedMessage(),
+                    ],
                     const SizedBox(height: 24),
                     _buildTasksPreview(),
                     const SizedBox(height: 24),
@@ -48,7 +52,7 @@ class LessonDetailsSheet extends StatelessWidget {
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: AppColors.textMuted.withValues(alpha: 0.3),
+          color: Colors.grey.shade300,
           borderRadius: BorderRadius.circular(2),
         ),
       );
@@ -61,6 +65,9 @@ class LessonDetailsSheet extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: _getGradient(),
+              color: lesson.status == LessonStatus.locked
+                  ? Colors.grey.shade200
+                  : null,
               boxShadow: [
                 BoxShadow(
                   color: _getGlowColor(),
@@ -87,7 +94,9 @@ class LessonDetailsSheet extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   lesson.title,
-                  style: AppTypography.headlineSmall,
+                  style: AppTypography.headlineSmall.copyWith(
+                    color: Colors.black,
+                  ),
                 ),
               ],
             ),
@@ -149,7 +158,9 @@ class LessonDetailsSheet extends StatelessWidget {
         children: [
           Text(
             'Tarefas',
-            style: AppTypography.titleMedium,
+            style: AppTypography.titleMedium.copyWith(
+              color: Colors.black,
+            ),
           ),
           const SizedBox(height: 12),
           ...lesson.tasks.take(3).map(
@@ -160,13 +171,15 @@ class LessonDetailsSheet extends StatelessWidget {
                       Icon(
                         _getTaskIcon(task.type),
                         size: 20,
-                        color: AppColors.textSecondary,
+                        color: Colors.grey.shade700,
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           task.title,
-                          style: AppTypography.bodyMedium,
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: Colors.black87,
+                          ),
                         ),
                       ),
                     ],
@@ -177,25 +190,69 @@ class LessonDetailsSheet extends StatelessWidget {
             Text(
               'e mais ${lesson.tasks.length - 3} tarefa(s)...',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textMuted,
+                color: Colors.grey.shade600,
               ),
             ),
         ],
       );
 
+  Widget _buildLockedMessage() => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.orange.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.orange.shade200,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.lock_rounded,
+              color: Colors.orange.shade700,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Finalize a atividade anterior para desbloquear esta lição.',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: Colors.orange.shade900,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
   Widget _buildStartButton(BuildContext context) => SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: lesson.isAccessible ? onStart : null,
+          onPressed: lesson.isAccessible
+              ? () => ButtonTapHandler.handleTap(onStart)
+              : null,
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
+            backgroundColor: lesson.isAccessible
+                ? AppColors.primary
+                : Colors.grey.shade300,
+            foregroundColor: lesson.isAccessible
+                ? Colors.white
+                : Colors.grey.shade600,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
+            disabledBackgroundColor: Colors.grey.shade300,
+            disabledForegroundColor: Colors.grey.shade600,
           ),
           child: Text(
             lesson.isAccessible ? 'Iniciar Lição' : 'Bloqueada',
-            style: AppTypography.titleMedium,
+            style: AppTypography.titleMedium.copyWith(
+              color: lesson.isAccessible
+                  ? Colors.white
+                  : Colors.grey.shade600,
+            ),
           ),
         ),
       );
