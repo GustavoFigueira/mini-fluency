@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mini_fluency/core/core.dart';
+import 'package:mini_fluency/models/models.dart';
 
-import '../core/core.dart';
-import '../models/models.dart';
-
-/// Visual node representing a lesson in the learning path
 class LessonNode extends StatefulWidget {
   final LessonModel lesson;
   final VoidCallback? onTap;
@@ -56,69 +54,66 @@ class _LessonNodeState extends State<LessonNode>
       _pulseController.repeat(reverse: true);
     } else if (widget.lesson.status != LessonStatus.current &&
         _pulseController.isAnimating) {
-      _pulseController.stop();
-      _pulseController.reset();
+      _pulseController
+        ..stop()
+        ..reset();
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: widget.lesson.isAccessible ? widget.onTap : null,
-          child: Row(
-            children: [
-              _buildNodeCircle(),
-              AppSpacing.horizontalGapLG,
-              Expanded(child: _buildLessonInfo()),
-            ],
-          ),
-        ),
-        if (widget.showConnector) _buildConnector(),
-      ],
-    );
-  }
-
-  Widget _buildNodeCircle() {
-    return AnimatedBuilder(
-      animation: _pulseAnimation,
-      builder: (context, child) {
-        final scale = widget.lesson.status == LessonStatus.current
-            ? _pulseAnimation.value
-            : 1.0;
-
-        return Transform.scale(
-          scale: scale,
-          child: child,
-        );
-      },
-      child: Container(
-        width: 64,
-        height: 64,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: _getGradient(),
-          boxShadow: [
-            BoxShadow(
-              color: _getGlowColor(),
-              blurRadius:
-                  widget.lesson.status == LessonStatus.current ? 20 : 12,
-              spreadRadius:
-                  widget.lesson.status == LessonStatus.current ? 2 : 0,
+  Widget build(BuildContext context) => Column(
+        children: [
+          GestureDetector(
+            onTap: widget.lesson.isAccessible ? widget.onTap : null,
+            child: Row(
+              children: [
+                _buildNodeCircle(),
+                AppSpacing.horizontalGapLG,
+                Expanded(child: _buildLessonInfo()),
+              ],
             ),
-          ],
-          border: Border.all(
-            color: _getBorderColor(),
-            width: 3,
+          ),
+          if (widget.showConnector) _buildConnector(),
+        ],
+      );
+
+  Widget _buildNodeCircle() => AnimatedBuilder(
+        animation: _pulseAnimation,
+        builder: (context, child) {
+          final scale = widget.lesson.status == LessonStatus.current
+              ? _pulseAnimation.value
+              : 1.0;
+
+          return Transform.scale(
+            scale: scale,
+            child: child,
+          );
+        },
+        child: Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: _getGradient(),
+            boxShadow: [
+              BoxShadow(
+                color: _getGlowColor(),
+                blurRadius:
+                    widget.lesson.status == LessonStatus.current ? 20 : 12,
+                spreadRadius:
+                    widget.lesson.status == LessonStatus.current ? 2 : 0,
+              ),
+            ],
+            border: Border.all(
+              color: _getBorderColor(),
+              width: 3,
+            ),
+          ),
+          child: Center(
+            child: _getNodeContent(),
           ),
         ),
-        child: Center(
-          child: _getNodeContent(),
-        ),
-      ),
-    );
-  }
+      );
 
   LinearGradient? _getGradient() {
     switch (widget.lesson.status) {
@@ -220,47 +215,44 @@ class _LessonNodeState extends State<LessonNode>
     required IconData icon,
     required String label,
     required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusSM),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: color),
-          AppSpacing.horizontalGapXS,
-          Text(
-            label,
-            style: AppTypography.labelSmall.copyWith(color: color),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildConnector() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 30),
-      child: Container(
-        width: 4,
-        height: 40,
+  }) =>
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              _getConnectorColor(),
-              _getConnectorColor().withValues(alpha: 0.3),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          borderRadius: BorderRadius.circular(2),
+          color: color.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusSM),
         ),
-      ),
-    );
-  }
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: color),
+            AppSpacing.horizontalGapXS,
+            Text(
+              label,
+              style: AppTypography.labelSmall.copyWith(color: color),
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildConnector() => Padding(
+        padding: const EdgeInsets.only(left: 30),
+        child: Container(
+          width: 4,
+          height: 40,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                _getConnectorColor(),
+                _getConnectorColor().withValues(alpha: 0.3),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+      );
 
   Color _getConnectorColor() {
     switch (widget.lesson.status) {

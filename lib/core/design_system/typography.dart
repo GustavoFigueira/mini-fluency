@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'colors.dart';
+import 'package:mini_fluency/core/design_system/colors.dart';
 
-/// Fluency Academy typography system using DM Sans font
 abstract final class AppTypography {
   static TextStyle get displayLarge => GoogleFonts.dmSans(
         fontSize: 32,
