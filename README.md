@@ -5,6 +5,7 @@ Aplicativo de trilha de aprendizado de inglês desenvolvido para a Fluency Acade
 ## 🌐 Preview Online
 
 Acesse a versão online: [👉💻 Site](https://mini-fluency.web.app/)
+![Live Preview](docs/live-preview.gif)
 
 ## Requisitos
 
