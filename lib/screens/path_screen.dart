@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mini_fluency/core/core.dart';
 import 'package:mini_fluency/core/services/audio_service.dart';
 import 'package:mini_fluency/data/data.dart';
@@ -8,6 +9,7 @@ import 'package:mini_fluency/screens/tasks_screen.dart';
 import 'package:mini_fluency/widgets/lesson_transition.dart';
 import 'package:mini_fluency/widgets/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PathScreen extends StatefulWidget {
   const PathScreen({super.key});
@@ -432,30 +434,48 @@ class _PathScreenState extends State<PathScreen>
 
   Widget _buildBottomIcon() {
     final colors = context.themeColors;
+    final backgroundColor = colors.isDark
+        ? const Color(0xFF65BDE9)
+        : const Color(0xFF5627E8);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
-      child: Container(
-        width: 64,
-        height: 64,
-        decoration: BoxDecoration(
-          gradient: colors.primaryGradient,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: colors.primary.withValues(alpha: 0.4),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
+      child: GestureDetector(
+        onTap: () => ButtonTapHandler.handleTap(_openFluencyWebsite),
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: backgroundColor.withValues(alpha: 0.4),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: SvgPicture.asset(
+              'assets/images/logos/fluency-icon.svg',
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
+              ),
             ),
-          ],
-        ),
-        child: const Icon(
-          Icons.school_rounded,
-          color: Colors.white,
-          size: 32,
+          ),
         ),
       ),
     );
+  }
+
+  Future<void> _openFluencyWebsite() async {
+    final uri = Uri.parse('https://fluency.io/br/');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 }
 
@@ -482,6 +502,7 @@ class PathConnectorPainter extends CustomPainter {
 
     const nodeWidth = 80.0;
     const margin = 14.0;
+    const verticalLineLength = 8.0;
     final centerX = size.width / 2;
 
     final startX = fromRight
@@ -491,14 +512,19 @@ class PathConnectorPainter extends CustomPainter {
         ? centerX + (nodeWidth / 2) + margin
         : centerX - (nodeWidth / 2) - margin;
 
+    const topVerticalEnd = margin + verticalLineLength;
+    final bottomVerticalStart = size.height - margin - verticalLineLength;
+
     path
       ..moveTo(startX, margin)
+      ..lineTo(startX, topVerticalEnd)
       ..quadraticBezierTo(
         centerX,
         size.height / 2,
         endX,
-        size.height - margin,
-      );
+        bottomVerticalStart,
+      )
+      ..lineTo(endX, size.height - margin);
 
     canvas.drawPath(path, paint);
   }
