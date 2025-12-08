@@ -70,51 +70,50 @@ class _TasksScreenState extends State<TasksScreen>
     final colors = context.themeColors;
 
     return Scaffold(
-        body: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: colors.backgroundGradient,
-          ),
-          child: SafeArea(
-            child: Consumer<PathProvider>(
-              builder: (context, provider, child) {
-                final lesson = provider.getLessonById(widget.lessonId);
-                if (lesson == null) {
-                  return _buildNotFound();
-                }
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: colors.backgroundGradient,
+        ),
+        child: SafeArea(
+          child: Consumer<PathProvider>(
+            builder: (context, provider, child) {
+              final lesson = provider.getLessonById(widget.lessonId);
+              if (lesson == null) {
+                return _buildNotFound();
+              }
 
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _checkCompletion(provider, lesson);
-                  _previousLessonState = lesson;
-                });
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _checkCompletion(provider, lesson);
+                _previousLessonState = lesson;
+              });
 
-                return Stack(
-                  children: [
-                    _buildContent(provider, lesson),
-                    if (_showCelebration)
-                      CompletionCelebration(
-                        onComplete: () {
-                          setState(() => _showCelebration = false);
-                        },
-                      ),
-                  ],
-                );
-              },
-            ),
+              return Stack(
+                children: [
+                  _buildContent(provider, lesson),
+                  if (_showCelebration)
+                    CompletionCelebration(
+                      onComplete: () {
+                        setState(() => _showCelebration = false);
+                      },
+                    ),
+                ],
+              );
+            },
           ),
         ),
-      );
+      ),
+    );
   }
 
   Widget _buildNotFound() {
     final colors = context.themeColors;
 
     return Center(
-        child: Text(
-          'Lição não encontrada',
-          style:
-              AppTypography.bodyLarge.copyWith(color: colors.textSecondary),
-        ),
-      );
+      child: Text(
+        'Lição não encontrada',
+        style: AppTypography.bodyLarge.copyWith(color: colors.textSecondary),
+      ),
+    );
   }
 
   Widget _buildContent(PathProvider provider, LessonModel lesson) {
@@ -143,7 +142,8 @@ class _TasksScreenState extends State<TasksScreen>
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final task = lesson.tasks[index];
-                  final isCurrentlyCompleted = provider.isTaskCompleted(task.id);
+                  final isCurrentlyCompleted =
+                      provider.isTaskCompleted(task.id);
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -185,103 +185,103 @@ class _TasksScreenState extends State<TasksScreen>
     final colors = context.themeColors;
 
     return Padding(
-        padding: AppSpacing.screenPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                _buildBackButton(),
-                AppSpacing.horizontalGapMD,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Lição ${lesson.position}',
-                        style: AppTypography.labelMedium.copyWith(
-                          color: colors.primary,
-                        ),
+      padding: AppSpacing.screenPadding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _buildBackButton(),
+              AppSpacing.horizontalGapMD,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Lição ${lesson.position}',
+                      style: AppTypography.labelMedium.copyWith(
+                        color: colors.primary,
                       ),
-                      AppSpacing.verticalGapXS,
-                      Text(
-                        lesson.title,
-                        style: AppTypography.headlineMedium.copyWith(
-                          color: colors.textPrimary,
-                        ),
+                    ),
+                    AppSpacing.verticalGapXS,
+                    Text(
+                      lesson.title,
+                      style: AppTypography.headlineMedium.copyWith(
+                        color: colors.textPrimary,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                _buildXpBadge(lesson.xp),
-              ],
-            ),
-            AppSpacing.verticalGapLG,
-          ],
-        ),
-      );
+              ),
+              _buildXpBadge(lesson.xp),
+            ],
+          ),
+          AppSpacing.verticalGapLG,
+        ],
+      ),
+    );
   }
 
   Widget _buildBackButton() {
     final colors = context.themeColors;
 
     return GestureDetector(
-        onTap: () => ButtonTapHandler.handleTap(
-          () => Navigator.of(context).pop(),
+      onTap: () => ButtonTapHandler.handleTap(
+        () => Navigator.of(context).pop(),
+      ),
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusMD),
+          border: Border.all(color: colors.border),
         ),
-        child: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: colors.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusMD),
-            border: Border.all(color: colors.border),
-          ),
-          child: Icon(
-            Icons.arrow_back_rounded,
-            color: colors.textPrimary,
-            size: 20,
-          ),
+        child: Icon(
+          Icons.arrow_back_rounded,
+          color: colors.textPrimary,
+          size: 20,
         ),
-      );
+      ),
+    );
   }
 
   Widget _buildXpBadge(int xp) {
     final colors = context.themeColors;
 
     return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              colors.warning.withValues(alpha: 0.2),
-              colors.warning.withValues(alpha: 0.1),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusFull),
-          border: Border.all(
-            color: colors.warning.withValues(alpha: 0.3),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.bolt_rounded,
-              color: colors.warning,
-              size: 18,
-            ),
-            AppSpacing.horizontalGapXS,
-            Text(
-              '$xp XP',
-              style: AppTypography.labelLarge.copyWith(
-                color: colors.warning,
-              ),
-            ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            colors.warning.withValues(alpha: 0.2),
+            colors.warning.withValues(alpha: 0.1),
           ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-      );
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusFull),
+        border: Border.all(
+          color: colors.warning.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.bolt_rounded,
+            color: colors.warning,
+            size: 18,
+          ),
+          AppSpacing.horizontalGapXS,
+          Text(
+            '$xp XP',
+            style: AppTypography.labelLarge.copyWith(
+              color: colors.warning,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

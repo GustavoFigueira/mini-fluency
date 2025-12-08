@@ -78,7 +78,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
 
   Widget _buildThemeSection() => Consumer<ThemeProvider>(
-      builder: (context, themeProvider, _) => _buildSectionCard(
+        builder: (context, themeProvider, _) => _buildSectionCard(
           children: [
             Text(
               'APARÊNCIA',
@@ -105,7 +105,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ],
         ),
-    );
+      );
 
   Widget _buildThemeOption({
     required IconData icon,
@@ -333,7 +333,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           Switch(
             value: value,
-            onChanged: (newValue) => ButtonTapHandler.handleToggle(onChanged, newValue: newValue),
+            onChanged: (newValue) =>
+                ButtonTapHandler.handleToggle(onChanged, newValue: newValue),
             activeThumbColor: AppColors.primary,
           ),
         ],

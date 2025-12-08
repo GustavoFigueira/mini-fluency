@@ -121,11 +121,14 @@ class _LessonNodeState extends State<LessonNode>
                     ? [
                         BoxShadow(
                           color: _getGlowColor(),
-                          blurRadius: widget.lesson.status == LessonStatus.current
-                              ? 20
-                              : 12,
+                          blurRadius:
+                              widget.lesson.status == LessonStatus.current
+                                  ? 20
+                                  : 12,
                           spreadRadius:
-                              widget.lesson.status == LessonStatus.current ? 2 : 0,
+                              widget.lesson.status == LessonStatus.current
+                                  ? 2
+                                  : 0,
                         ),
                       ]
                     : null,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mini_fluency/core/core.dart';
 import 'package:mini_fluency/core/services/audio_service.dart';
 import 'package:mini_fluency/data/data.dart';
@@ -32,7 +31,9 @@ class _PathScreenState extends State<PathScreen>
     super.initState();
     _fadeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(
+        milliseconds: AppConstants.fadeAnimationDuration,
+      ),
     );
     _fadeAnimation = CurvedAnimation(
       parent: _fadeController,
@@ -205,13 +206,17 @@ class _PathScreenState extends State<PathScreen>
       children: [
         _buildBackgroundDecorations(),
         _buildLessonsPath(reversedLessons, provider),
-        _buildHeader(path.name, path.description),
+        PathHeader(
+          title: path.name,
+          onSettingsTap: _navigateToSettings,
+          onSoundPreferencesTap: _showSoundPreferences,
+        ),
         Positioned(
           bottom: 0,
           left: 0,
           right: 0,
           child: Center(
-            child: _buildBottomIcon(),
+            child: PathBottomIcon(onTap: _openFluencyWebsite),
           ),
         ),
       ],
@@ -228,113 +233,6 @@ class _PathScreenState extends State<PathScreen>
     );
   }
 
-  Widget _buildHeader(String title, String description) {
-    final colors = context.themeColors;
-
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: SafeArea(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                colors.backgroundGradient.colors.first,
-                colors.backgroundGradient.colors.first.withValues(alpha: 0.0),
-              ],
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colors.primary.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: colors.isLight
-                            ? colors.primaryLightMode.withValues(alpha: 0.5)
-                            : colors.primary.withValues(alpha: 0.5),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Trilha de Aprendizado',
-                          style: AppTypography.labelSmall.copyWith(
-                            color: colors.isLight
-                                ? colors.primaryLightMode
-                                : colors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          title,
-                          style: AppTypography.titleLarge.copyWith(
-                            color: colors.isLight
-                                ? colors.primaryLightMode
-                                : colors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                _buildHeaderAction(
-                  Icons.settings_outlined,
-                  _navigateToSettings,
-                ),
-                const SizedBox(width: 8),
-                _buildHeaderAction(
-                  Icons.volume_up_outlined,
-                  _showSoundPreferences,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeaderAction(IconData icon, VoidCallback onTap) {
-    final colors = context.themeColors;
-
-    return GestureDetector(
-      onTap: () => ButtonTapHandler.handleTap(onTap),
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: colors.primary.withValues(alpha: 0.2),
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: colors.isLight
-                ? colors.primaryLightMode.withValues(alpha: 0.5)
-                : colors.primary.withValues(alpha: 0.5),
-          ),
-        ),
-        child: Icon(
-          icon,
-          color: colors.primaryLight,
-          size: 22,
-        ),
-      ),
-    );
-  }
-
   Widget _buildLessonsPath(
     List<LessonModel> reversedLessons,
     PathProvider provider,
@@ -345,10 +243,10 @@ class _PathScreenState extends State<PathScreen>
           return ListView.builder(
             controller: _scrollController,
             padding: const EdgeInsets.only(
-              top: 100,
-              bottom: 120,
-              left: 10,
-              right: 10,
+              top: AppConstants.listViewTopPadding,
+              bottom: AppConstants.listViewBottomPadding,
+              left: AppConstants.listViewHorizontalPadding,
+              right: AppConstants.listViewHorizontalPadding,
             ),
             physics: const BouncingScrollPhysics(),
             itemCount: reversedLessons.length,
@@ -359,12 +257,18 @@ class _PathScreenState extends State<PathScreen>
 
               return TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0.0, end: 1.0),
-                duration: Duration(milliseconds: 400 + (index * 50)),
+                duration: Duration(
+                  milliseconds: AppConstants.animationBaseDuration +
+                      (index * AppConstants.animationDurationIncrement),
+                ),
                 curve: Curves.easeOutCubic,
                 builder: (context, value, child) => Opacity(
                   opacity: value,
                   child: Transform.translate(
-                    offset: Offset(0, 20 * (1 - value)),
+                    offset: Offset(
+                      0,
+                      AppConstants.animationTranslateOffset * (1 - value),
+                    ),
                     child: child,
                   ),
                 ),
@@ -402,10 +306,16 @@ class _PathScreenState extends State<PathScreen>
   }) {
     final alignment = isEven ? Alignment.centerRight : Alignment.centerLeft;
     final horizontalPadding = isEven
-        ? const EdgeInsets.only(right: 20, left: 100)
-        : const EdgeInsets.only(left: 20, right: 100);
-    const listViewPadding = 10.0;
-    final availableWidth = screenWidth - (listViewPadding * 2);
+        ? const EdgeInsets.only(
+            right: AppConstants.lessonNodePaddingRight,
+            left: AppConstants.lessonNodePaddingLeftLarge,
+          )
+        : const EdgeInsets.only(
+            left: AppConstants.lessonNodePaddingLeft,
+            right: AppConstants.lessonNodePaddingRightLarge,
+          );
+    final availableWidth =
+        screenWidth - (AppConstants.listViewHorizontalPadding * 2);
 
     return Column(
       children: [
@@ -424,142 +334,27 @@ class _PathScreenState extends State<PathScreen>
           ),
         ),
         if (showConnector)
-          SizedBox(
+          PathConnector(
+            fromRight: isEven,
+            toRight: nextIsEven,
+            status: lesson.status,
             width: availableWidth,
-            height: 60,
-            child: CustomPaint(
-              painter: PathConnectorPainter(
-                fromRight: isEven,
-                toRight: nextIsEven,
-                color: _getConnectorColor(lesson.status),
-              ),
-            ),
           ),
       ],
     );
   }
-
-  Color _getConnectorColor(LessonStatus status) {
-    final colors = context.themeColors;
-
-    switch (status) {
-      case LessonStatus.completed:
-        return colors.success.withValues(alpha: 0.6);
-      case LessonStatus.current:
-        return colors.primary.withValues(alpha: 0.6);
-      case LessonStatus.locked:
-        return Colors.grey.withValues(alpha: 0.3);
-    }
-  }
-
-  Widget _buildBottomIcon() {
-    final colors = context.themeColors;
-    final backgroundColor =
-        colors.isDark ? const Color(0xFF65BDE9) : colors.primaryLightMode;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: GestureDetector(
-        onTap: () => ButtonTapHandler.handleTap(_openFluencyWebsite),
-        child: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: colors.isDark
-                ? [
-                    BoxShadow(
-                      color: backgroundColor.withValues(alpha: 0.4),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: SvgPicture.asset(
-              'assets/images/logos/fluency-icon.svg',
-              colorFilter: const ColorFilter.mode(
-                Colors.white,
-                BlendMode.srcIn,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _openFluencyWebsite() async {
-    final uri = Uri.parse('https://fluency.io/br/');
-    try {
-      await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
-    } catch (e) {
-      debugPrint('Error launching URL: $e');
-    }
-  }
 }
 
-class PathConnectorPainter extends CustomPainter {
-  final bool fromRight;
-  final bool toRight;
-  final Color color;
-
-  PathConnectorPainter({
-    required this.fromRight,
-    required this.toRight,
-    required this.color,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 4
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final path = Path();
-
-    const nodeWidth = 80.0;
-    const margin = 14.0;
-    const verticalLineLength = 8.0;
-    final centerX = size.width / 2;
-
-    final startX = fromRight
-        ? centerX + (nodeWidth / 2) + margin
-        : centerX - (nodeWidth / 2) - margin;
-    final endX = toRight
-        ? centerX + (nodeWidth / 2) + margin
-        : centerX - (nodeWidth / 2) - margin;
-
-    const topVerticalEnd = margin + verticalLineLength;
-    final bottomVerticalStart = size.height - margin - verticalLineLength;
-
-    path
-      ..moveTo(startX, margin)
-      ..lineTo(startX, topVerticalEnd)
-      ..quadraticBezierTo(
-        centerX,
-        size.height / 2,
-        endX,
-        bottomVerticalStart,
-      )
-      ..lineTo(endX, size.height - margin);
-
-    canvas.drawPath(path, paint);
+Future<void> _openFluencyWebsite() async {
+  final uri = Uri.parse(AppConstants.fluencyWebsiteUrl);
+  try {
+    await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+  } catch (e) {
+    debugPrint('Error launching URL: $e');
   }
-
-  @override
-  bool shouldRepaint(covariant PathConnectorPainter oldDelegate) =>
-      oldDelegate.fromRight != fromRight ||
-      oldDelegate.toRight != toRight ||
-      oldDelegate.color != color;
 }
 
 class StarsPainter extends CustomPainter {
