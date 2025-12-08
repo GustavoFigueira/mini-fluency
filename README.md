@@ -12,7 +12,7 @@ Aplicativo de trilha de aprendizado de inglês desenvolvido para a Fluency Acade
 1. Clone o repositório
 2. Execute `flutter pub get`
 3. Execute `flutter pub run build_runner build --delete-conflicting-outputs`
-4. Execute `flutter run`
+4. Execute `flutter run` ou use os botões de execução do VSCode/Cursor com o `launch.json` configurado
 
 ## Funcionalidades
 
@@ -115,7 +115,23 @@ O aplicativo inclui uma trilha sonora de fundo sem direitos autorais, similar ao
 
 ### Customização Nativa
 
-O aplicativo possui customizações nativas para o launcher icon e splash screen, utilizando os assets oficiais da [Fluency Academy](https://fluency.io/br/). A splash screen utiliza a cor de fundo `#EDEDED` com o logo Mini Fluency, enquanto o launcher icon utiliza o ícone oficial com fundo `#5627E8`.
+O aplicativo possui customizações nativas para o launcher icon e splash screen, utilizando os assets oficiais da [Fluency Academy](https://fluency.io/br/). A splash screen utiliza o logo Mini Fluency, enquanto o launcher icon utiliza o ícone oficial.
+
+### Testes
+
+O projeto possui testes unitários e de widget cobrindo as funcionalidades principais:
+
+- Testes de acessibilidade de lições (bloqueadas/desbloqueadas)
+- Testes de finalização de tasks e lições completas
+- Testes de componentes visuais principais
+
+Para executar os testes:
+
+```bash
+flutter test
+```
+
+Mais detalhes sobre o projeto podem ser encontrados no [repositório GitHub](https://github.com/GustavoFigueira/mini-fluency).
 
 ## Tempo de Desenvolvimento
 

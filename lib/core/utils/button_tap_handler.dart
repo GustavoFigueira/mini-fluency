@@ -10,7 +10,10 @@ class ButtonTapHandler {
     callback();
   }
 
-  static void handleToggle(ValueChanged<bool>? onChanged, {required bool newValue}) {
+  static void handleToggle(
+    ValueChanged<bool>? onChanged, {
+    required bool newValue,
+  }) {
     if (onChanged == null) return;
     _audioService.playButtonTap().ignore();
     onChanged(newValue);

@@ -31,9 +31,8 @@ class MiniFluencyApp extends StatelessWidget {
               debugShowCheckedModeBanner: false,
               theme: _buildLightTheme(colors),
               darkTheme: _buildDarkTheme(colors),
-              themeMode: themeProvider.isDarkMode
-                  ? ThemeMode.dark
-                  : ThemeMode.light,
+              themeMode:
+                  themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
               home: const PathScreenWithAudio(),
             );
           },
@@ -44,13 +43,11 @@ class MiniFluencyApp extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: colors.isDark
-            ? Brightness.light
-            : Brightness.dark,
+        statusBarIconBrightness:
+            colors.isDark ? Brightness.light : Brightness.dark,
         systemNavigationBarColor: colors.background,
-        systemNavigationBarIconBrightness: colors.isDark
-            ? Brightness.light
-            : Brightness.dark,
+        systemNavigationBarIconBrightness:
+            colors.isDark ? Brightness.light : Brightness.dark,
       ),
     );
   }
