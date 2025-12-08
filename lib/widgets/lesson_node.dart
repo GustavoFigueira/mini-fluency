@@ -108,29 +108,37 @@ class _LessonNodeState extends State<LessonNode>
             child: child,
           );
         },
-        child: Container(
-          width: vertical ? 80 : 64,
-          height: vertical ? 80 : 64,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: _getGradient(),
-            boxShadow: [
-              BoxShadow(
-                color: _getGlowColor(),
-                blurRadius:
-                    widget.lesson.status == LessonStatus.current ? 20 : 12,
-                spreadRadius:
-                    widget.lesson.status == LessonStatus.current ? 2 : 0,
+        child: Builder(
+          builder: (context) {
+            final colors = context.themeColors;
+            return Container(
+              width: vertical ? 64 : 56,
+              height: vertical ? 64 : 56,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: _getGradient(),
+                boxShadow: colors.isDark
+                    ? [
+                        BoxShadow(
+                          color: _getGlowColor(),
+                          blurRadius: widget.lesson.status == LessonStatus.current
+                              ? 20
+                              : 12,
+                          spreadRadius:
+                              widget.lesson.status == LessonStatus.current ? 2 : 0,
+                        ),
+                      ]
+                    : null,
+                border: Border.all(
+                  color: _getBorderColor(),
+                  width: 3,
+                ),
               ),
-            ],
-            border: Border.all(
-              color: _getBorderColor(),
-              width: 3,
-            ),
-          ),
-          child: Center(
-            child: _getNodeContent(vertical: vertical),
-          ),
+              child: Center(
+                child: _getNodeContent(vertical: vertical),
+              ),
+            );
+          },
         ),
       );
 
@@ -161,13 +169,14 @@ class _LessonNodeState extends State<LessonNode>
   }
 
   Color _getBorderColor() {
+    final colors = context.themeColors;
     switch (widget.lesson.status) {
       case LessonStatus.completed:
         return AppColors.successLight;
       case LessonStatus.current:
         return AppColors.primaryLight;
       case LessonStatus.locked:
-        return AppColors.locked;
+        return colors.lockedLight;
     }
   }
 

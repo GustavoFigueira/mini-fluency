@@ -261,7 +261,9 @@ class _PathScreenState extends State<PathScreen>
                       color: colors.primary.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: colors.primary.withValues(alpha: 0.5),
+                        color: colors.isLight
+                            ? colors.primaryLightMode.withValues(alpha: 0.5)
+                            : colors.primary.withValues(alpha: 0.5),
                       ),
                     ),
                     child: Column(
@@ -271,14 +273,18 @@ class _PathScreenState extends State<PathScreen>
                         Text(
                           'Trilha de Aprendizado',
                           style: AppTypography.labelSmall.copyWith(
-                            color: colors.primaryLight,
+                            color: colors.isLight
+                                ? colors.primaryLightMode
+                                : colors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           title,
                           style: AppTypography.titleLarge.copyWith(
-                            color: colors.textPrimary,
+                            color: colors.isLight
+                                ? colors.primaryLightMode
+                                : colors.textPrimary,
                           ),
                         ),
                       ],
@@ -315,7 +321,9 @@ class _PathScreenState extends State<PathScreen>
           color: colors.primary.withValues(alpha: 0.2),
           shape: BoxShape.circle,
           border: Border.all(
-            color: colors.primary.withValues(alpha: 0.4),
+            color: colors.isLight
+                ? colors.primaryLightMode.withValues(alpha: 0.5)
+                : colors.primary.withValues(alpha: 0.5),
           ),
         ),
         child: Icon(
@@ -331,50 +339,56 @@ class _PathScreenState extends State<PathScreen>
     List<LessonModel> reversedLessons,
     PathProvider provider,
   ) =>
-      ListView.builder(
-        controller: _scrollController,
-        padding: const EdgeInsets.only(
-          top: 100,
-          bottom: 120,
-          left: 20,
-          right: 20,
-        ),
-        physics: const BouncingScrollPhysics(),
-        itemCount: reversedLessons.length,
-        itemBuilder: (context, index) {
-          final lesson = reversedLessons[index];
-          final isEven = index.isEven;
-          final previousStatus = _previousLessonStatuses[lesson.id];
+      Builder(
+        builder: (context) {
+          final screenWidth = MediaQuery.of(context).size.width;
+          return ListView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.only(
+              top: 100,
+              bottom: 120,
+              left: 10,
+              right: 10,
+            ),
+            physics: const BouncingScrollPhysics(),
+            itemCount: reversedLessons.length,
+            itemBuilder: (context, index) {
+              final lesson = reversedLessons[index];
+              final isEven = index.isEven;
+              final previousStatus = _previousLessonStatuses[lesson.id];
 
-          return TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.0, end: 1.0),
-            duration: Duration(milliseconds: 400 + (index * 50)),
-            curve: Curves.easeOutCubic,
-            builder: (context, value, child) => Opacity(
-              opacity: value,
-              child: Transform.translate(
-                offset: Offset(0, 20 * (1 - value)),
-                child: child,
-              ),
-            ),
-            child: LessonTransition(
-              previousLesson: LessonModel(
-                id: lesson.id,
-                title: lesson.title,
-                position: lesson.position,
-                status: previousStatus ?? lesson.status,
-                xp: lesson.xp,
-                estimatedMinutes: lesson.estimatedMinutes,
-                tasks: lesson.tasks,
-              ),
-              currentLesson: lesson,
-              child: _buildLessonNode(
-                lesson: lesson,
-                isEven: isEven,
-                showConnector: index < reversedLessons.length - 1,
-                nextIsEven: (index + 1).isEven,
-              ),
-            ),
+              return TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: Duration(milliseconds: 400 + (index * 50)),
+                curve: Curves.easeOutCubic,
+                builder: (context, value, child) => Opacity(
+                  opacity: value,
+                  child: Transform.translate(
+                    offset: Offset(0, 20 * (1 - value)),
+                    child: child,
+                  ),
+                ),
+                child: LessonTransition(
+                  previousLesson: LessonModel(
+                    id: lesson.id,
+                    title: lesson.title,
+                    position: lesson.position,
+                    status: previousStatus ?? lesson.status,
+                    xp: lesson.xp,
+                    estimatedMinutes: lesson.estimatedMinutes,
+                    tasks: lesson.tasks,
+                  ),
+                  currentLesson: lesson,
+                  child: _buildLessonNode(
+                    lesson: lesson,
+                    isEven: isEven,
+                    showConnector: index < reversedLessons.length - 1,
+                    nextIsEven: (index + 1).isEven,
+                    screenWidth: screenWidth,
+                  ),
+                ),
+              );
+            },
           );
         },
       );
@@ -384,11 +398,14 @@ class _PathScreenState extends State<PathScreen>
     required bool isEven,
     required bool showConnector,
     required bool nextIsEven,
+    required double screenWidth,
   }) {
     final alignment = isEven ? Alignment.centerRight : Alignment.centerLeft;
     final horizontalPadding = isEven
-        ? const EdgeInsets.only(right: 40, left: 100)
-        : const EdgeInsets.only(left: 40, right: 100);
+        ? const EdgeInsets.only(right: 20, left: 100)
+        : const EdgeInsets.only(left: 20, right: 100);
+    const listViewPadding = 10.0;
+    final availableWidth = screenWidth - (listViewPadding * 2);
 
     return Column(
       children: [
@@ -407,12 +424,15 @@ class _PathScreenState extends State<PathScreen>
           ),
         ),
         if (showConnector)
-          CustomPaint(
-            size: const Size(double.infinity, 60),
-            painter: PathConnectorPainter(
-              fromRight: isEven,
-              toRight: nextIsEven,
-              color: _getConnectorColor(lesson.status),
+          SizedBox(
+            width: availableWidth,
+            height: 60,
+            child: CustomPaint(
+              painter: PathConnectorPainter(
+                fromRight: isEven,
+                toRight: nextIsEven,
+                color: _getConnectorColor(lesson.status),
+              ),
             ),
           ),
       ],
@@ -434,27 +454,28 @@ class _PathScreenState extends State<PathScreen>
 
   Widget _buildBottomIcon() {
     final colors = context.themeColors;
-    final backgroundColor = colors.isDark
-        ? const Color(0xFF65BDE9)
-        : const Color(0xFF5627E8);
+    final backgroundColor =
+        colors.isDark ? const Color(0xFF65BDE9) : colors.primaryLightMode;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 10),
       child: GestureDetector(
         onTap: () => ButtonTapHandler.handleTap(_openFluencyWebsite),
         child: Container(
-          width: 56,
-          height: 56,
+          width: 48,
+          height: 48,
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: backgroundColor.withValues(alpha: 0.4),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: colors.isDark
+                ? [
+                    BoxShadow(
+                      color: backgroundColor.withValues(alpha: 0.4),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
           ),
           child: Padding(
             padding: const EdgeInsets.all(10),
@@ -473,8 +494,13 @@ class _PathScreenState extends State<PathScreen>
 
   Future<void> _openFluencyWebsite() async {
     final uri = Uri.parse('https://fluency.io/br/');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    try {
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+    } catch (e) {
+      debugPrint('Error launching URL: $e');
     }
   }
 }
