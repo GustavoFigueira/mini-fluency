@@ -12,8 +12,8 @@ class AppThemeColors {
   // Fluency Brand Colors
   // Roxo: #5627E8
   Color get primary => isDark
-      ? const Color(0xFF5627E8) // Fluency Purple
-      : const Color(0xFF5627E8);
+      ? const Color(0xFF5627E8) // Fluency Purple - base color
+      : const Color(0xFF5A2BEA); // Slightly brighter for light mode
 
   Color get primaryLight => isDark
       ? const Color(0xFF7C5FED) // Lighter purple for dark mode
@@ -21,7 +21,7 @@ class AppThemeColors {
 
   Color get primaryDark => isDark
       ? const Color(0xFF4518D4) // Darker purple for dark mode
-      : const Color(0xFF4518D4);
+      : const Color(0xFF4A1BC8); // Slightly lighter dark purple for light mode
 
   Color get primaryLightMode => const Color(0xFF5627E8);
 
