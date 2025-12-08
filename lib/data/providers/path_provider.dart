@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:mini_fluency/data/repositories/repositories.dart';
 import 'package:mini_fluency/models/models.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum PathState { initial, loading, loaded, error }
 
 class PathProvider extends ChangeNotifier {
+  static const String _progressKey = 'task_completion_progress';
   final PathRepository _repository;
 
   PathState _state = PathState.initial;
@@ -25,6 +28,7 @@ class PathProvider extends ChangeNotifier {
 
     try {
       _path = await _repository.loadPath();
+      await _loadProgressFromCache();
       _initializeTaskCompletionState();
       _normalizeInitialStatuses();
       _state = PathState.loaded;
@@ -37,12 +41,39 @@ class PathProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> _loadProgressFromCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final progressJson = prefs.getString(_progressKey);
+      if (progressJson == null) return;
+
+      final decoded = jsonDecode(progressJson) as Map<String, dynamic>;
+      for (final entry in decoded.entries) {
+        _taskCompletionState[entry.key] = entry.value as bool;
+      }
+    } catch (e) {
+      debugPrint('Error loading progress from cache: $e');
+    }
+  }
+
+  Future<void> _saveProgressToCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final progressJson = jsonEncode(_taskCompletionState);
+      await prefs.setString(_progressKey, progressJson);
+    } catch (e) {
+      debugPrint('Error saving progress to cache: $e');
+    }
+  }
+
   void _initializeTaskCompletionState() {
     if (_path == null) return;
 
     for (final lesson in _path!.lessons) {
       for (final task in lesson.tasks) {
-        _taskCompletionState[task.id] = task.isCompleted;
+        if (!_taskCompletionState.containsKey(task.id)) {
+          _taskCompletionState[task.id] = task.isCompleted;
+        }
       }
     }
   }
@@ -85,6 +116,7 @@ class PathProvider extends ChangeNotifier {
   void toggleTaskCompletion(String lessonId, String taskId) {
     final currentState = _taskCompletionState[taskId] ?? false;
     _taskCompletionState[taskId] = !currentState;
+    _saveProgressToCache();
     notifyListeners();
   }
 

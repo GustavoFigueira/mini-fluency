@@ -64,9 +64,7 @@ class MiniFluencyApp extends StatelessWidget {
           secondary: colors.secondary,
           surface: colors.surface,
           error: colors.error,
-          onPrimary: Colors.white,
           onSecondary: Colors.white,
-          onError: Colors.white,
           onSurface: colors.textPrimary,
         ),
         appBarTheme: AppBarTheme(
