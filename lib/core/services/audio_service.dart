@@ -1,5 +1,6 @@
+import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AudioService {
@@ -8,6 +9,7 @@ class AudioService {
 
   final AudioPlayer _backgroundPlayer = AudioPlayer();
   final AudioPlayer _sfxPlayer = AudioPlayer();
+  StreamSubscription<PlayerState>? _stateSubscription;
   bool _isMusicPlaying = false;
   bool _isMusicEnabled = true;
   bool _isSfxEnabled = true;
@@ -28,6 +30,16 @@ class AudioService {
       await _backgroundPlayer.setPlayerMode(PlayerMode.mediaPlayer);
       await _sfxPlayer.setPlayerMode(PlayerMode.lowLatency);
       await _loadPreferences();
+
+      _stateSubscription =
+          _backgroundPlayer.onPlayerStateChanged.listen((state) {
+        if (state == PlayerState.playing) {
+          _isMusicPlaying = true;
+        } else if (state == PlayerState.completed ||
+            state == PlayerState.stopped) {
+          _isMusicPlaying = false;
+        }
+      });
 
       if (_isMusicEnabled) {
         await Future.delayed(const Duration(milliseconds: 100));
@@ -156,6 +168,7 @@ class AudioService {
   }
 
   Future<void> dispose() async {
+    await _stateSubscription?.cancel();
     await _backgroundPlayer.dispose();
     await _sfxPlayer.dispose();
   }

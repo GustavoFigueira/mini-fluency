@@ -161,7 +161,7 @@ class _PathScreenWithAudioState extends State<PathScreenWithAudio> {
 
   @override
   void dispose() {
-    _audioService.dispose().ignore();
+    _audioService.dispose();
     super.dispose();
   }
 
