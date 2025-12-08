@@ -2,6 +2,10 @@
 
 Aplicativo de trilha de aprendizado de inglês desenvolvido para a Fluency Academy.
 
+## 🌐 Preview Online
+
+Acesse a versão online: [👉💻 Site](https://mini-fluency.web.app/)
+
 ## Requisitos
 
 - Flutter 3.38.7 ou superior
@@ -74,14 +78,6 @@ lib/
 - **Design System**: Tokens centralizados (colors, typography, spacing)
 - **Clean Architecture**: Separação em camadas (data, models, screens, widgets)
 
-Exemplo de import com barrel export:
-
-```dart
-import '../core/core.dart';
-import '../models/models.dart';
-import '../data/data.dart';
-```
-
 ## Geração de Código
 
 Para regenerar models após alterações:
@@ -102,16 +98,11 @@ Utilizei o Cursor como auxílio para acelerar o desenvolvimento. Parte do códig
 
 ### Cache Local do Progresso
 
-O aplicativo salva automaticamente o progresso do usuário localmente usando `SharedPreferences`. Todas as tarefas concluídas são persistidas e restauradas automaticamente ao reabrir o app, permitindo que o usuário retome exatamente de onde parou. O cache é atualizado em tempo real sempre que uma tarefa é marcada como concluída ou não concluída.
+O aplicativo salva automaticamente o progresso localmente usando `SharedPreferences`, permitindo que o usuário retome de onde parou ao reabrir o app.
 
 ### Trilha Sonora
 
-O aplicativo inclui uma trilha sonora de fundo sem direitos autorais, similar ao app Fluency. Os arquivos de áudio estão localizados em `assets/audio/`:
-
-- `background_music.mp3` - Música de fundo em loop
-- `intro.mp3` - Som de introdução ao carregar a home pela primeira vez
-- `button-tap-pop.mp3` - Efeito sonoro em todos os cliques de botões e interações
-- `completed.mp3` - Efeito sonoro ao finalizar uma missão completa
+O aplicativo inclui uma trilha sonora de fundo sem direitos autorais, similar ao app Fluency, com efeitos sonoros para feedback de ações.
 
 ### Customização Nativa
 

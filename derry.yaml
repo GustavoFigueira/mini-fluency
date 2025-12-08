@@ -31,3 +31,12 @@ launcher_icon:
 # Format code
 format:
   - dart format lib/ test/
+
+# Deploy to Firebase Hosting
+deploy:firebase:
+  - firebase deploy --only hosting
+
+# Build and deploy to Firebase
+build:deploy:
+  - flutter build web --release --wasm
+  - firebase deploy --only hosting
