@@ -2,7 +2,7 @@
 
 Aplicativo de trilha de aprendizado de inglês desenvolvido para a Fluency Academy.
 
-## 🌐 Preview Online
+## 🌐 App Final
 
 Acesse a versão online: [👉💻 Site](https://mini-fluency.web.app/)
 
