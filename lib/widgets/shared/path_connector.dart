@@ -7,6 +7,7 @@ class PathConnector extends StatelessWidget {
   final bool toRight;
   final LessonStatus status;
   final double width;
+  final double screenWidth;
 
   const PathConnector({
     super.key,
@@ -14,6 +15,7 @@ class PathConnector extends StatelessWidget {
     required this.toRight,
     required this.status,
     required this.width,
+    required this.screenWidth,
   });
 
   @override
@@ -27,6 +29,7 @@ class PathConnector extends StatelessWidget {
           fromRight: fromRight,
           toRight: toRight,
           color: _getConnectorColor(colors, status),
+          screenWidth: screenWidth,
         ),
       ),
     );
@@ -52,11 +55,13 @@ class _PathConnectorPainter extends CustomPainter {
   final bool fromRight;
   final bool toRight;
   final Color color;
+  final double screenWidth;
 
   _PathConnectorPainter({
     required this.fromRight,
     required this.toRight,
     required this.color,
+    required this.screenWidth,
   });
 
   @override
@@ -68,14 +73,46 @@ class _PathConnectorPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     final path = Path();
-    final centerX = size.width / 2;
 
-    final startX = fromRight
-        ? centerX + (AppConstants.nodeWidth / 2) + AppConstants.connectorMargin
-        : centerX - (AppConstants.nodeWidth / 2) - AppConstants.connectorMargin;
-    final endX = toRight
-        ? centerX + (AppConstants.nodeWidth / 2) + AppConstants.connectorMargin
-        : centerX - (AppConstants.nodeWidth / 2) - AppConstants.connectorMargin;
+    // Node size when vertical layout is used (64x64)
+    const double nodeSize = 64.0;
+
+    // Calculate the actual X position of the top node (fromRight)
+    // For right-aligned nodes: screenWidth - listViewPadding - rightPadding - nodeRadius
+    // For left-aligned nodes: listViewPadding + leftPadding + nodeRadius
+    final topNodeCenterX = fromRight
+        ? screenWidth -
+            AppConstants.listViewHorizontalPadding -
+            AppConstants.lessonNodePaddingRight -
+            (nodeSize / 2)
+        : AppConstants.listViewHorizontalPadding +
+            AppConstants.lessonNodePaddingLeft +
+            (nodeSize / 2);
+
+    // Calculate the actual X position of the bottom node (toRight)
+    final bottomNodeCenterX = toRight
+        ? screenWidth -
+            AppConstants.listViewHorizontalPadding -
+            AppConstants.lessonNodePaddingRight -
+            (nodeSize / 2)
+        : AppConstants.listViewHorizontalPadding +
+            AppConstants.lessonNodePaddingLeft +
+            (nodeSize / 2);
+
+    // Calculate start and end positions relative to the connector's local coordinate system
+    // The connector's width is the available width, so we need to map the node positions
+    final connectorLeftOffset = AppConstants.listViewHorizontalPadding;
+    final startX = (topNodeCenterX - connectorLeftOffset) +
+        (fromRight
+            ? AppConstants.connectorMargin
+            : -AppConstants.connectorMargin);
+    final endX = (bottomNodeCenterX - connectorLeftOffset) +
+        (toRight
+            ? AppConstants.connectorMargin
+            : -AppConstants.connectorMargin);
+
+    // Calculate the center X for the bezier curve
+    final centerX = (startX + endX) / 2;
 
     const topVerticalEnd =
         AppConstants.connectorMargin + AppConstants.connectorVerticalLineLength;
@@ -101,5 +138,6 @@ class _PathConnectorPainter extends CustomPainter {
   bool shouldRepaint(covariant _PathConnectorPainter oldDelegate) =>
       oldDelegate.fromRight != fromRight ||
       oldDelegate.toRight != toRight ||
-      oldDelegate.color != color;
+      oldDelegate.color != color ||
+      oldDelegate.screenWidth != screenWidth;
 }

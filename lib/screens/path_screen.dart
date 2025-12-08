@@ -339,6 +339,7 @@ class _PathScreenState extends State<PathScreen>
             toRight: nextIsEven,
             status: lesson.status,
             width: availableWidth,
+            screenWidth: screenWidth,
           ),
       ],
     );
