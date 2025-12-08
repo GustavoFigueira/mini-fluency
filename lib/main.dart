@@ -5,6 +5,7 @@ import 'package:mini_fluency/core/core.dart';
 import 'package:mini_fluency/core/services/audio_service.dart';
 import 'package:mini_fluency/data/data.dart';
 import 'package:mini_fluency/screens/screens.dart';
+import 'package:mini_fluency/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -33,7 +34,9 @@ class MiniFluencyApp extends StatelessWidget {
               darkTheme: _buildDarkTheme(colors),
               themeMode:
                   themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-              home: const PathScreenWithAudio(),
+              home: const MobileDevicePreview(
+                child: PathScreenWithAudio(),
+              ),
             );
           },
         ),

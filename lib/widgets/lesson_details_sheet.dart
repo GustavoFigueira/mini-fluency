@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mini_fluency/core/core.dart';
+import 'package:mini_fluency/data/data.dart';
 import 'package:mini_fluency/models/models.dart';
+import 'package:provider/provider.dart';
 
 class LessonDetailsSheet extends StatelessWidget {
   final LessonModel lesson;
@@ -237,47 +239,53 @@ class LessonDetailsSheet extends StatelessWidget {
     BuildContext context,
     AppThemeColors colors,
     AppThemeColors modalColors,
-  ) =>
-      SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
-          onPressed: lesson.isAccessible
-              ? () => ButtonTapHandler.handleTap(onStart)
-              : null,
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            backgroundColor: lesson.isAccessible
-                ? colors.primary
-                : modalColors.isDark
-                    ? Colors.grey.shade300
-                    : Colors.grey.shade700,
-            foregroundColor: lesson.isAccessible
+  ) {
+    final provider = context.read<PathProvider>();
+    final completedCount = provider.getCompletedTasksCount(lesson.id);
+    final hasStarted = completedCount > 0;
+    final buttonText = lesson.isAccessible
+        ? (hasStarted ? 'Retomar Lição' : 'Iniciar Lição')
+        : 'Bloqueada';
+
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: lesson.isAccessible
+            ? () => ButtonTapHandler.handleTap(onStart)
+            : null,
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          backgroundColor: lesson.isAccessible
+              ? colors.primary
+              : modalColors.isDark
+                  ? Colors.grey.shade300
+                  : Colors.grey.shade700,
+          foregroundColor: lesson.isAccessible
+              ? Colors.white
+              : modalColors.isDark
+                  ? Colors.grey.shade900
+                  : Colors.grey.shade200,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          disabledBackgroundColor:
+              modalColors.isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+          disabledForegroundColor:
+              modalColors.isDark ? Colors.grey.shade900 : Colors.grey.shade200,
+        ),
+        child: Text(
+          buttonText,
+          style: AppTypography.titleMedium.copyWith(
+            color: lesson.isAccessible
                 ? Colors.white
                 : modalColors.isDark
                     ? Colors.grey.shade900
                     : Colors.grey.shade200,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            disabledBackgroundColor: modalColors.isDark
-                ? Colors.grey.shade300
-                : Colors.grey.shade700,
-            disabledForegroundColor: modalColors.isDark
-                ? Colors.grey.shade900
-                : Colors.grey.shade200,
-          ),
-          child: Text(
-            lesson.isAccessible ? 'Iniciar Lição' : 'Bloqueada',
-            style: AppTypography.titleMedium.copyWith(
-              color: lesson.isAccessible
-                  ? Colors.white
-                  : modalColors.isDark
-                      ? Colors.grey.shade900
-                      : Colors.grey.shade200,
-            ),
           ),
         ),
-      );
+      ),
+    );
+  }
 
   LinearGradient? _getGradient(AppThemeColors colors) {
     switch (lesson.status) {
