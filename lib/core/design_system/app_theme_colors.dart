@@ -12,6 +12,7 @@ class AppThemeColors {
   Color get primary => const Color(0xFF6366F1);
   Color get primaryLight => const Color(0xFF818CF8);
   Color get primaryDark => const Color(0xFF4F46E5);
+  Color get primaryLightMode => const Color(0xFF5627E8);
 
   Color get secondary => isDark
       ? const Color(0xFF22D3EE)
@@ -80,7 +81,7 @@ class AppThemeColors {
 
   Color get lockedLight => isDark
       ? const Color(0xFF71717A)
-      : const Color(0xFFD0C4D8);
+      : const Color.fromARGB(255, 186, 178, 190);
 
   Color get completedGlow => const Color(0xFF10B981);
   Color get currentGlow => const Color(0xFF6366F1);
