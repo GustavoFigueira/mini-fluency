@@ -33,7 +33,7 @@ class _LessonNodeState extends State<LessonNode>
       duration: const Duration(milliseconds: 1500),
     );
 
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
@@ -186,7 +186,7 @@ class _LessonNodeState extends State<LessonNode>
           return Icon(
             Icons.school_rounded,
             color: Colors.white,
-            size: 48,
+            size: 40,
           );
         }
         return Text(

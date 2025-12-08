@@ -113,6 +113,10 @@ O aplicativo inclui uma trilha sonora de fundo sem direitos autorais, similar ao
 - `button-tap-pop.mp3` - Efeito sonoro em todos os cliques de botões e interações
 - `completed.mp3` - Efeito sonoro ao finalizar uma missão completa
 
+### Customização Nativa
+
+O aplicativo possui customizações nativas para o launcher icon e splash screen, utilizando os assets oficiais da [Fluency Academy](https://fluency.io/br/). A splash screen utiliza a cor de fundo `#EDEDED` com o logo Mini Fluency, enquanto o launcher icon utiliza o ícone oficial com fundo `#5627E8`.
+
 ## Tempo de Desenvolvimento
 
-Aproximadamente 4-5 horas
+Aproximadamente 6 horas
