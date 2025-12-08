@@ -74,8 +74,7 @@ class _PathConnectorPainter extends CustomPainter {
 
     final path = Path();
 
-    // Node size when vertical layout is used (64x64)
-    const double nodeSize = 64.0;
+    const nodeSize = 64.0;
 
     // Calculate the actual X position of the top node (fromRight)
     // For right-aligned nodes: screenWidth - listViewPadding - rightPadding - nodeRadius
@@ -99,9 +98,7 @@ class _PathConnectorPainter extends CustomPainter {
             AppConstants.lessonNodePaddingLeft +
             (nodeSize / 2);
 
-    // Calculate start and end positions relative to the connector's local coordinate system
-    // The connector's width is the available width, so we need to map the node positions
-    final connectorLeftOffset = AppConstants.listViewHorizontalPadding;
+    const connectorLeftOffset = AppConstants.listViewHorizontalPadding;
     final startX = (topNodeCenterX - connectorLeftOffset) +
         (fromRight
             ? AppConstants.connectorMargin

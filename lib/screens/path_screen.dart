@@ -40,7 +40,6 @@ class _PathScreenState extends State<PathScreen>
       curve: Curves.easeOut,
     );
     _scrollController = ScrollController();
-    _audioService.initialize();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PathProvider>().loadPath();

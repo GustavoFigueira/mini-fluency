@@ -1,11 +1,10 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AudioService {
   static final AudioService _instance = AudioService._internal();
   factory AudioService() => _instance;
-  AudioService._internal();
 
   final AudioPlayer _backgroundPlayer = AudioPlayer();
   final AudioPlayer _sfxPlayer = AudioPlayer();
@@ -13,6 +12,9 @@ class AudioService {
   bool _isMusicEnabled = true;
   bool _isSfxEnabled = true;
   bool _isVibrationEnabled = true;
+  bool _isInitialized = false;
+
+  AudioService._internal();
 
   bool get isPlaying => _isMusicPlaying;
   bool get isMusicEnabled => _isMusicEnabled;
@@ -20,9 +22,21 @@ class AudioService {
   bool get isVibrationEnabled => _isVibrationEnabled;
 
   Future<void> initialize() async {
-    await _loadPreferences();
-    if (_isMusicEnabled) {
-      await playBackgroundMusic();
+    if (_isInitialized) return;
+
+    try {
+      await _backgroundPlayer.setPlayerMode(PlayerMode.mediaPlayer);
+      await _sfxPlayer.setPlayerMode(PlayerMode.lowLatency);
+      await _loadPreferences();
+
+      if (_isMusicEnabled) {
+        await Future.delayed(const Duration(milliseconds: 100));
+        await playBackgroundMusic();
+      }
+
+      _isInitialized = true;
+    } catch (e) {
+      debugPrint('Error initializing audio service: $e');
     }
   }
 
@@ -74,14 +88,25 @@ class AudioService {
     if (_isMusicPlaying) return;
 
     try {
+      await _backgroundPlayer.setPlayerMode(PlayerMode.mediaPlayer);
       await _backgroundPlayer.setReleaseMode(ReleaseMode.loop);
       await _backgroundPlayer.setVolume(0.35);
+
       await _backgroundPlayer.play(
         AssetSource('audio/background_music.mp3'),
       );
-      _isMusicPlaying = true;
+
+      await Future.delayed(const Duration(milliseconds: 200));
+
+      final state = _backgroundPlayer.state;
+      if (state == PlayerState.playing) {
+        _isMusicPlaying = true;
+      } else {
+        _isMusicPlaying = false;
+      }
     } catch (e) {
       debugPrint('Error playing background music: $e');
+      _isMusicPlaying = false;
     }
   }
 

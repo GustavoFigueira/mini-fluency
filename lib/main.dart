@@ -1,3 +1,5 @@
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,7 +12,17 @@ import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MiniFluencyApp());
+
+  if (kIsWeb) {
+    runApp(
+      DevicePreview(
+        builder: (_) => const MiniFluencyApp(),
+        backgroundColor: Colors.black,
+      ),
+    );
+  } else {
+    runApp(const MiniFluencyApp());
+  }
 }
 
 class MiniFluencyApp extends StatelessWidget {
@@ -30,13 +42,13 @@ class MiniFluencyApp extends StatelessWidget {
             return MaterialApp(
               title: 'Mini Fluency',
               debugShowCheckedModeBanner: false,
+              locale: kIsWeb ? DevicePreview.locale(context) : null,
+              builder: MobileDevicePreview.getAppBuilder(),
               theme: _buildLightTheme(colors),
               darkTheme: _buildDarkTheme(colors),
               themeMode:
                   themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-              home: const MobileDevicePreview(
-                child: PathScreenWithAudio(),
-              ),
+              home: const PathScreenWithAudio(),
             );
           },
         ),
