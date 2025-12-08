@@ -9,37 +9,67 @@ class AppThemeColors {
   bool get isDark => themeMode == AppThemeMode.dark;
   bool get isLight => themeMode == AppThemeMode.light;
 
-  Color get primary => const Color(0xFF6366F1);
-  Color get primaryLight => const Color(0xFF818CF8);
-  Color get primaryDark => const Color(0xFF4F46E5);
+  // Fluency Brand Colors
+  // Roxo: #5627E8
+  Color get primary => isDark
+      ? const Color(0xFF5627E8) // Fluency Purple
+      : const Color(0xFF5627E8);
+
+  Color get primaryLight => isDark
+      ? const Color(0xFF7C5FED) // Lighter purple for dark mode
+      : const Color(0xFF6B3FF5); // Slightly lighter for light mode
+
+  Color get primaryDark => isDark
+      ? const Color(0xFF4518D4) // Darker purple for dark mode
+      : const Color(0xFF4518D4);
+
   Color get primaryLightMode => const Color(0xFF5627E8);
 
+  // Azul Claro: #65BDE9
   Color get secondary =>
-      isDark ? const Color(0xFF22D3EE) : const Color(0xFF0891B2);
+      isDark ? const Color(0xFF65BDE9) : const Color(0xFF4A9BC4);
 
   Color get secondaryLight =>
-      isDark ? const Color(0xFF67E8F9) : const Color(0xFF0E7490);
+      isDark ? const Color(0xFF8DD4F0) : const Color(0xFF65BDE9);
 
-  Color get secondaryDark => const Color(0xFF06B6D4);
+  Color get secondaryDark =>
+      isDark ? const Color(0xFF4A9BC4) : const Color(0xFF3A7FA3);
 
-  Color get success => const Color(0xFF10B981);
-  Color get successLight => const Color(0xFF34D399);
-  Color get successDark => const Color(0xFF059669);
+  // Verde Claro: #7BFFB4
+  Color get success => isDark
+      ? const Color(0xFF7BFFB4) // Fluency Light Green
+      : const Color(0xFF5FE89A); // Slightly darker for light mode
 
+  Color get successLight => isDark
+      ? const Color(0xFF9EFFC8) // Lighter green for dark mode
+      : const Color(0xFF7BFFB4); // Original for light mode
+
+  Color get successDark => isDark
+      ? const Color(0xFF5FE89A) // Darker green for dark mode
+      : const Color(0xFF4BC97F); // Even darker for light mode
+
+  // Amarelo: #F3B124
   Color get warning =>
-      isDark ? const Color(0xFFF59E0B) : const Color(0xFFD97706);
+      isDark ? const Color(0xFFF3B124) : const Color(0xFFE09A1A);
 
   Color get warningLight =>
-      isDark ? const Color(0xFFFBBF24) : const Color(0xFFB45309);
+      isDark ? const Color(0xFFF5C04A) : const Color(0xFFF3B124);
 
-  Color get error => const Color(0xFFEF4444);
-  Color get errorLight => const Color(0xFFF87171);
+  // Vermelho: #FC4B33
+  Color get error => isDark
+      ? const Color(0xFFFC4B33) // Fluency Red
+      : const Color(0xFFE6391F); // Slightly darker for light mode
 
+  Color get errorLight => isDark
+      ? const Color(0xFFFF6B5A) // Lighter red for dark mode
+      : const Color(0xFFFC4B33); // Original for light mode
+
+  // Background with subtle purple tint to complement Fluency brand
   Color get background =>
-      isDark ? const Color(0xFF0F0F23) : const Color(0xFFF5F0FF);
+      isDark ? const Color(0xFF0F0A1F) : const Color(0xFFF8F5FF);
 
   Color get backgroundLight =>
-      isDark ? const Color(0xFF1A1A2E) : const Color(0xFFFAF7FF);
+      isDark ? const Color(0xFF1A1229) : const Color(0xFFFAF7FF);
 
   Color get surface =>
       isDark ? const Color(0xFF16213E) : const Color(0xFFFFFFFF);
@@ -69,37 +99,56 @@ class AppThemeColors {
       ? const Color(0xFF71717A)
       : const Color.fromARGB(255, 186, 178, 190);
 
-  Color get completedGlow => const Color(0xFF10B981);
-  Color get currentGlow => const Color(0xFF6366F1);
+  Color get completedGlow => success;
+  Color get currentGlow => primary;
   Color get lockedGlow =>
       isDark ? const Color(0xFF27272A) : const Color(0xFFE8E0F0);
 
-  LinearGradient get primaryGradient => const LinearGradient(
-        colors: [Color(0xFF6366F1), Color(0xFF22D3EE)],
+  // Gradient using Fluency brand colors: Purple to Light Blue
+  LinearGradient get primaryGradient => LinearGradient(
+        colors: isDark
+            ? [primary, secondary] // Purple to Light Blue
+            : [primary, secondaryLight], // Slightly adjusted for light mode
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       );
 
+  // Background gradient with Fluency purple tones
   LinearGradient get backgroundGradient => isDark
-      ? const LinearGradient(
-          colors: [Color(0xFF0F0F23), Color(0xFF1A1A3E)],
+      ? LinearGradient(
+          colors: [
+            const Color(0xFF0F0A1F), // Dark purple-tinted background
+            const Color(0xFF1A1229), // Slightly lighter purple-tinted
+            const Color(0xFF1A0F2E), // Even lighter
+          ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         )
-      : const LinearGradient(
-          colors: [Color(0xFFF5F0FF), Color(0xFFE8E0F5), Color(0xFFF0E8FA)],
+      : LinearGradient(
+          colors: [
+            const Color(0xFFF8F5FF), // Very light purple tint
+            const Color(0xFFF0E8FA), // Light purple
+            const Color(0xFFE8E0F5), // Slightly more purple
+          ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         );
 
+  // Card gradient with subtle Fluency brand influence
   LinearGradient get cardGradient => isDark
-      ? const LinearGradient(
-          colors: [Color(0xFF1F2937), Color(0xFF16213E)],
+      ? LinearGradient(
+          colors: [
+            const Color(0xFF1A1229), // Purple-tinted dark
+            const Color(0xFF16213E), // Dark blue-purple
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         )
-      : const LinearGradient(
-          colors: [Color(0xFFFFFFFF), Color(0xFFF9F6FF)],
+      : LinearGradient(
+          colors: [
+            const Color(0xFFFFFFFF), // Pure white
+            const Color(0xFFF9F6FF), // Very light purple tint
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
@@ -112,4 +161,17 @@ class AppThemeColors {
 
   Color get modalTextSecondary =>
       isDark ? const Color(0xFF6B5B7A) : const Color(0xFFA1A1AA);
+
+  // Rosa Claro: #F38897 - Accent color for special highlights
+  Color get accent => isDark
+      ? const Color(0xFFF38897) // Fluency Light Pink
+      : const Color(0xFFE87585); // Slightly darker for light mode
+
+  Color get accentLight => isDark
+      ? const Color(0xFFFFA5B3) // Lighter pink for dark mode
+      : const Color(0xFFF38897); // Original for light mode
+
+  Color get accentDark => isDark
+      ? const Color(0xFFE87585) // Darker pink for dark mode
+      : const Color(0xFFD96473); // Even darker for light mode
 }

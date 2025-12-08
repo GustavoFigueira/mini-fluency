@@ -365,9 +365,10 @@ class StarsPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // Use Fluency brand purple (#5627E8) for stars
     final starColor = isDark
         ? Colors.white.withValues(alpha: 0.3)
-        : const Color(0xFF6366F1).withValues(alpha: 0.4);
+        : const Color(0xFF5627E8).withValues(alpha: 0.4);
 
     final paint = Paint()..color = starColor;
 
@@ -390,7 +391,7 @@ class StarsPainter extends CustomPainter {
 
     paint.color = isDark
         ? Colors.white.withValues(alpha: 0.15)
-        : const Color(0xFF6366F1).withValues(alpha: 0.25);
+        : const Color(0xFF5627E8).withValues(alpha: 0.25);
     for (var i = 0; i < 20; i++) {
       final x = (size.width * (i * 0.05 + 0.02)) % size.width;
       final y = (size.height * (i * 0.07 + 0.03)) % size.height;
