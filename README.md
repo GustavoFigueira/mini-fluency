@@ -21,7 +21,8 @@ Aplicativo de trilha de aprendizado de inglês desenvolvido para a Fluency Acade
 - Lista de tarefas por lição com toggle de conclusão
 - Indicador de progresso
 - Animações e transições suaves
-- Tema escuro
+- Tema escuro/claro com inversão automática do modal
+- Cache local do progresso - o app salva automaticamente quais tarefas e módulos foram concluídos, permitindo que o usuário retome de onde parou ao reabrir o app
 - Trilha sonora de fundo (sem direitos autorais, similar ao app Fluency)
 - Efeitos sonoros para feedback de ações (completar tarefa, finalizar lição)
 
@@ -98,6 +99,10 @@ Código e documentação técnica em inglês para padronização.
 ### Uso de IA
 
 Utilizei o Cursor como auxílio para acelerar o desenvolvimento. Parte do código foi gerada com IA, porém todo o projeto foi refinado manualmente, com atenção especial nas telas e arquitetura, utilizando minha com usabilidade e experiência do usuário.
+
+### Cache Local do Progresso
+
+O aplicativo salva automaticamente o progresso do usuário localmente usando `SharedPreferences`. Todas as tarefas concluídas são persistidas e restauradas automaticamente ao reabrir o app, permitindo que o usuário retome exatamente de onde parou. O cache é atualizado em tempo real sempre que uma tarefa é marcada como concluída ou não concluída.
 
 ### Trilha Sonora
 

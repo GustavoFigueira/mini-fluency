@@ -202,14 +202,15 @@ class _PathScreenState extends State<PathScreen>
     return Stack(
       children: [
         _buildBackgroundDecorations(),
-        Column(
-          children: [
-            _buildHeader(path.name, path.description),
-            Expanded(
-              child: _buildLessonsPath(reversedLessons, provider),
-            ),
-            _buildBottomIcon(),
-          ],
+        _buildLessonsPath(reversedLessons, provider),
+        _buildHeader(path.name, path.description),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: _buildBottomIcon(),
+          ),
         ),
       ],
     );
@@ -219,58 +220,83 @@ class _PathScreenState extends State<PathScreen>
     final colors = context.themeColors;
 
     return Positioned.fill(
-        child: CustomPaint(
-          painter: StarsPainter(isDark: colors.isDark),
-        ),
-      );
+      child: CustomPaint(
+        painter: StarsPainter(isDark: colors.isDark),
+      ),
+    );
   }
 
   Widget _buildHeader(String title, String description) {
     final colors = context.themeColors;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-              decoration: BoxDecoration(
-                color: colors.primary.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: colors.primary.withValues(alpha: 0.5),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Trilha de Aprendizado',
-                    style: AppTypography.labelSmall.copyWith(
-                      color: colors.primaryLight,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    title,
-                    style: AppTypography.titleLarge.copyWith(
-                      color: colors.textPrimary,
-                    ),
-                  ),
-                ],
-              ),
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: SafeArea(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                colors.backgroundGradient.colors.first,
+                colors.backgroundGradient.colors.first.withValues(alpha: 0.0),
+              ],
             ),
           ),
-          const SizedBox(width: 12),
-          _buildHeaderAction(Icons.settings_outlined, _navigateToSettings),
-          const SizedBox(width: 8),
-          _buildHeaderAction(Icons.volume_up_outlined, _showSoundPreferences),
-        ],
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.primary.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: colors.primary.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Trilha de Aprendizado',
+                          style: AppTypography.labelSmall.copyWith(
+                            color: colors.primaryLight,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          title,
+                          style: AppTypography.titleLarge.copyWith(
+                            color: colors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                _buildHeaderAction(
+                  Icons.settings_outlined,
+                  _navigateToSettings,
+                ),
+                const SizedBox(width: 8),
+                _buildHeaderAction(
+                  Icons.volume_up_outlined,
+                  _showSoundPreferences,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -305,7 +331,12 @@ class _PathScreenState extends State<PathScreen>
   ) =>
       ListView.builder(
         controller: _scrollController,
-        padding: const EdgeInsets.symmetric(vertical: 20).copyWith(bottom: 40),
+        padding: const EdgeInsets.only(
+          top: 100,
+          bottom: 120,
+          left: 20,
+          right: 20,
+        ),
         physics: const BouncingScrollPhysics(),
         itemCount: reversedLessons.length,
         itemBuilder: (context, index) {
@@ -375,7 +406,7 @@ class _PathScreenState extends State<PathScreen>
         ),
         if (showConnector)
           CustomPaint(
-            size: const Size(double.infinity, 40),
+            size: const Size(double.infinity, 60),
             painter: PathConnectorPainter(
               fromRight: isEven,
               toRight: nextIsEven,
@@ -449,17 +480,24 @@ class PathConnectorPainter extends CustomPainter {
 
     final path = Path();
 
-    const nodeRadius = 40.0;
-    final startX = fromRight ? size.width - nodeRadius : nodeRadius;
-    final endX = toRight ? size.width - nodeRadius : nodeRadius;
+    const nodeWidth = 80.0;
+    const margin = 14.0;
+    final centerX = size.width / 2;
+
+    final startX = fromRight
+        ? centerX + (nodeWidth / 2) + margin
+        : centerX - (nodeWidth / 2) - margin;
+    final endX = toRight
+        ? centerX + (nodeWidth / 2) + margin
+        : centerX - (nodeWidth / 2) - margin;
 
     path
-      ..moveTo(startX, 0)
+      ..moveTo(startX, margin)
       ..quadraticBezierTo(
-        size.width / 2,
+        centerX,
         size.height / 2,
         endX,
-        size.height,
+        size.height - margin,
       );
 
     canvas.drawPath(path, paint);

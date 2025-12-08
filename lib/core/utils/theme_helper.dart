@@ -5,10 +5,9 @@ import 'package:provider/provider.dart';
 
 extension ThemeExtension on BuildContext {
   AppThemeColors get themeColors {
-    final themeProvider = Provider.of<ThemeProvider>(this, listen: true);
+    final themeProvider = Provider.of<ThemeProvider>(this);
     return AppThemeColors(themeProvider.themeMode);
   }
 
-  ThemeProvider get themeProvider => Provider.of<ThemeProvider>(this, listen: true);
+  ThemeProvider get themeProvider => Provider.of<ThemeProvider>(this);
 }
-
